@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YetAnotherGarminConnectClient", "src\YetAnotherGarminConnectClient.csproj", "{C07A15E4-C002-4AA2-A82A-504B1E8A1568}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YetAnotherGarminConnectClient.Tests", "tests\YetAnotherGarminConnectClient.Tests.csproj", "{6423FD40-D1DF-4A4A-B6C6-CCA259DF6847}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C07A15E4-C002-4AA2-A82A-504B1E8A1568}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C07A15E4-C002-4AA2-A82A-504B1E8A1568}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C07A15E4-C002-4AA2-A82A-504B1E8A1568}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C07A15E4-C002-4AA2-A82A-504B1E8A1568}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6423FD40-D1DF-4A4A-B6C6-CCA259DF6847}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6423FD40-D1DF-4A4A-B6C6-CCA259DF6847}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6423FD40-D1DF-4A4A-B6C6-CCA259DF6847}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6423FD40-D1DF-4A4A-B6C6-CCA259DF6847}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DCA3DF59-F488-4E49-B981-DDFF63A26C71}
+	EndGlobalSection
+EndGlobal
