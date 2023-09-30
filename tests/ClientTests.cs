@@ -15,12 +15,12 @@ namespace YetAnotherGarminConnectClient.Tests
         }
 
         [Test]
-        public void ShouldReceiveOAuth2Token()
+        public async Task ShouldReceiveOAuth2Token()
         {
             var accessToken = "";
             var tokenSecret = "";
-            var token = _client.GetOAuth2Token(accessToken, tokenSecret);
-            Assert.IsNotNull(token);
+            await _client.SetOAuth2Token(accessToken, tokenSecret);
+            Assert.IsNotNull(_client.OAuth2Token);
         }
     }
 }

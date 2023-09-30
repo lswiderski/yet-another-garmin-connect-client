@@ -9,6 +9,7 @@ namespace YetAnotherGarminConnectClient
 {
     public interface IClient
     {
-        Task<OAuth2Token> GetOAuth2Token(string accessToken, string tokenSecret);
+        public OAuth2Token OAuth2Token { get; }
+        Task SetOAuth2Token(string accessToken, string tokenSecret);
     }
 }
