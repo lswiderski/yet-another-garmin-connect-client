@@ -35,6 +35,5 @@ namespace YetAnotherGarminConnectClient.Tests
             Assert.IsNotNull(_client.OAuth2Token);
         }
 
-
     }
 }
