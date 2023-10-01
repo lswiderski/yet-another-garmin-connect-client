@@ -1,3 +1,5 @@
+using NLog.Targets;
+using NLog;
 using NUnit.Framework;
 
 namespace YetAnotherGarminConnectClient.Tests
@@ -17,9 +19,19 @@ namespace YetAnotherGarminConnectClient.Tests
         [Test]
         public async Task ShouldReceiveOAuth2Token()
         {
-            var accessToken = "";
-            var tokenSecret = "";
-            await _client.SetOAuth2Token(accessToken, tokenSecret);
+            try
+            {
+                var accessToken = "";
+                var tokenSecret = "";
+                await _client.SetOAuth2Token(accessToken, tokenSecret);
+
+            }
+            catch (Exception ex)
+            {
+                var logs = Logger.GetLogs();
+                var errorLogs = Logger.GetErrorLogs();
+            }
+
             Assert.IsNotNull(_client.OAuth2Token);
         }
 

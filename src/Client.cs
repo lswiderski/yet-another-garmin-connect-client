@@ -1,5 +1,5 @@
 ﻿using Flurl.Http;
-using Microsoft.Extensions.Logging;
+using NLog;
 using OAuth;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace YetAnotherGarminConnectClient
         private readonly string _consumerKey;
         private readonly string _consumerSecret;
 
-        private readonly ILogger _logger;
+        private ILogger _logger => NLog.LogManager.GetLogger("Client");
         public OAuth2Token OAuth2Token { get; private set; }
         private Client() { }
         internal Client(string consumerKey, string consumerSecret)
@@ -56,11 +56,11 @@ namespace YetAnotherGarminConnectClient
             catch (FlurlHttpException ex)
             {
                 var error = await ex.GetResponseStringAsync();
-                _logger.LogError($"Error during OAuth2 handling, returned from {ex.Call.Request.Url}: {ex.Message}");
+                _logger.Error($"Error during OAuth2 handling, returned from {ex.Call.Request.Url}: {ex.Message}");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error during OAuth2 handling: {ex.Message}");
+                _logger.Error($"Error during OAuth2 handling: {ex.Message}");
             }
             throw new Exception("Error during OAuth2 handling");
 
