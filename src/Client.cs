@@ -1,5 +1,4 @@
-﻿using Flurl;
-using Flurl.Http;
+﻿using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using OAuth;
 using System;
@@ -14,8 +13,7 @@ namespace YetAnotherGarminConnectClient
 {
     internal class Client : IClient
     {
-        private static string USER_AGENT = "com.garmin.android.apps.connectmobile";
-        private static string OAUTH_EXCHANGE_URL = "https://connectapi.garmin.com/oauth-service/oauth/exchange/user/2.0";
+        private static string USER_AGENT = "com.garmin.android.apps.connectmobile"; 
         private readonly string _consumerKey;
         private readonly string _consumerSecret;
 
@@ -40,7 +38,7 @@ namespace YetAnotherGarminConnectClient
 
             OAuthRequest oauthRequest = OAuthRequest.ForProtectedResource("POST", _consumerKey, _consumerSecret, accessToken, tokenSecret);
 
-            oauthRequest.RequestUrl = OAUTH_EXCHANGE_URL;
+            oauthRequest.RequestUrl = URLs.OAUTH_EXCHANGE_URL;
             string authHeader = oauthRequest.GetAuthorizationHeader();
 
             try

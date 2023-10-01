@@ -9,9 +9,9 @@ namespace YetAnotherGarminConnectClient.Tests
 
         private IClient _client;
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
-            _client = ClientFactory.Create(_consumerKey, _consumerSecret);
+            _client = await ClientFactory.Create();
         }
 
         [Test]
@@ -22,5 +22,7 @@ namespace YetAnotherGarminConnectClient.Tests
             await _client.SetOAuth2Token(accessToken, tokenSecret);
             Assert.IsNotNull(_client.OAuth2Token);
         }
+
+
     }
 }
