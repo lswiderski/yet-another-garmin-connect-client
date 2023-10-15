@@ -4,14 +4,12 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <RepositoryUrl>https://github.com/lswiderski/yet-another-garmin-connect-client</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Flurl.Http" Version="4.0.0-pre3" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
     <PackageReference Include="NLog" Version="5.2.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.4" />
     <PackageReference Include="OAuth.DotNetCore" Version="3.0.1" />
