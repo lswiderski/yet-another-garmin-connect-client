@@ -15,4 +15,10 @@
     <PackageReference Include="OAuth.DotNetCore" Version="3.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Fit">
+      <HintPath>Fit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
