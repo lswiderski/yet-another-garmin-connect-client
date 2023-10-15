@@ -82,7 +82,7 @@ namespace YetAnotherGarminConnectClient
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Upload Weight Failed");
+                _logger.Error(ex, ex.Message);
             }
 
 
