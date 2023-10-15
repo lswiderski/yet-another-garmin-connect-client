@@ -17,10 +17,24 @@ namespace YetAnotherGarminConnectClient
         private readonly string _consumerSecret;
         private string _oAuthToken ="";
         private string _oAuthTokenSecret="";
+        CookieJar _cookieJar = null;
+
+        private static readonly object _commonQueryParams = new
+        {
+            id = "gauth-widget",
+            embedWidget = "true",
+            gauthHost = URLs.SSO_EMBED_URL,
+            redirectAfterAccountCreationUrl = URLs.SSO_EMBED_URL,
+            redirectAfterAccountLoginUrl = URLs.SSO_EMBED_URL,
+            service = URLs.SSO_EMBED_URL,
+            source = URLs.SSO_EMBED_URL,
+        };
 
         private ILogger _logger => NLog.LogManager.GetLogger("Client");
         public OAuth2Token OAuth2Token { get; private set; }
-       
+        public DateTime _oAuth2TokenValidUntil { get; private set; }
+
+
         private Client() { }
         internal Client(string consumerKey, string consumerSecret)
         {
@@ -30,6 +44,18 @@ namespace YetAnotherGarminConnectClient
 
         }
 
-       
+        public bool IsOAuthValid
+        {
+            get
+            {
+                if (this.OAuth2Token == null)
+                {
+                    return false;
+                }
+
+                return DateTime.UtcNow < _oAuth2TokenValidUntil;
+            }
+        }
+
     }
 }

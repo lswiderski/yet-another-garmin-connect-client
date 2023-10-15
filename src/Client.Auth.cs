@@ -3,17 +3,192 @@ using OAuth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using YetAnotherGarminConnectClient.Dto;
+using YetAnotherGarminConnectClient.Dto.Garmin;
 
 namespace YetAnotherGarminConnectClient
 {
     internal partial class Client : IClient
     {
 
+
+        public async Task<GarminAuthenciationResult> Authenticate(string email, string password)
+        {
+            var result = new GarminAuthenciationResult();
+            _cookieJar = null;
+
+            // Set cookies
+            try
+            {
+                await this.InitCookieJarAsync();
+            }
+
+
+            catch (FlurlHttpException ex)
+            {
+                this._logger.Error(ex, "Failed on first step of authentication flow. Init Cookies");
+                result.IsSuccess = false;
+                result.Error = ex.Message;
+                return result;
+            }
+
+            // get CSRF token
+            var csrfRequest = new
+            {
+                id = "gauth-widget",
+                embedWidget = "true",
+                gauthHost = URLs.SSO_EMBED_URL,
+                service = URLs.SSO_EMBED_URL,
+                source = URLs.SSO_EMBED_URL,
+                redirectAfterAccountLoginUrl = URLs.SSO_EMBED_URL,
+                redirectAfterAccountCreationUrl = URLs.SSO_EMBED_URL,
+            };
+
+            string csrfToken = string.Empty;
+            try
+            {
+                var tokenResult = await this.GetCsrfTokenAsync(csrfRequest);
+                csrfToken = this.FindCsrfToken(tokenResult);
+            }
+            catch (FlurlHttpException ex)
+            {
+                this._logger.Error(ex, "Failed to fetch csrf token from Garmin.");
+                result.IsSuccess = false;
+                result.Error = ex.Message;
+                return result;
+            }
+
+            // send credencials
+            var sendCredentialsRequest = new
+            {
+                username = email,
+                password = password,
+                embed = "true",
+                _csrf = csrfToken
+            };
+
+            SendCredentialsResult sendCredentialsResult = null;
+            try
+            {
+                sendCredentialsResult = await this.SendCredentialsAsync(csrfRequest, sendCredentialsRequest);
+            }
+            catch (FlurlHttpException ex) when (ex.StatusCode is (int)HttpStatusCode.Forbidden)
+            {
+                var responseContent = (await ex.GetResponseStringAsync()) ?? string.Empty;
+
+                if (responseContent == "error code: 1020")
+                {
+                    var errorMessage = "Garmin Authentication Failed. Blocked by CloudFlare.";
+                    this._logger.Error(ex, errorMessage);
+                    result.IsSuccess = false;
+                    result.Error = errorMessage;
+                    return result;
+                }
+                this._logger.Error(ex, "Garmin Authentication Failed.");
+                result.IsSuccess = false;
+                result.Error = ex.Message;
+                return result;
+            }
+
+            var loginResult = sendCredentialsResult?.RawResponseBody;
+
+            var ticketRegex = new Regex(MagicStrings.TICKET_REGEX);
+            var ticketMatch = ticketRegex.Match(loginResult);
+            if (!ticketMatch.Success)
+            {
+                var errorMessage = "Auth appeared successful but failed to find regex match for service ticket.";
+                this._logger.Error(errorMessage);
+                result.IsSuccess = false;
+                result.Error = errorMessage;
+                return result;
+            }
+
+            var ticket = ticketMatch.Groups.GetValueOrDefault("ticket").Value;
+            _logger.Debug($"Ticket: {ticket}");
+
+            if (string.IsNullOrWhiteSpace(ticket))
+            {
+                var errorMessage = "Auth appeared successful, and found service ticket, but ticket was null or empty.";
+                this._logger.Error(errorMessage);
+                result.IsSuccess = false;
+                result.Error = errorMessage;
+                return result;
+            }
+
+
+            // get Oauth1
+            var oAuth1 = await GetOAuth1Async(ticket);
+            if (string.IsNullOrEmpty(oAuth1.oAuthToken) || string.IsNullOrEmpty(oAuth1.oAuthTokenSecret))
+            {
+                var errorMessage = "Auth appeared successful but failed to get the OAuth1 token.";
+                result.IsSuccess = false;
+                result.Error = errorMessage;
+                return result;
+            }
+
+            // set OAuth2
+            await SetOAuth2Token(oAuth1.oAuthToken, oAuth1.oAuthTokenSecret);
+
+            if(OAuth2Token == null)
+            {
+                var errorMessage = "Auth appeared successful but failed to get the OAuth2 token.";
+                result.IsSuccess = false;
+                result.Error = errorMessage;
+                return result;
+            }
+
+            result.IsSuccess = true;
+            return result;
+        }
+
+
+        private async Task InitCookieJarAsync()
+        {
+            await URLs.SSO_EMBED_URL
+                        .WithHeader("User-Agent", MagicStrings.USER_AGENT)
+                        .WithHeader("origin", URLs.ORIGIN)
+                        .SetQueryParams(_commonQueryParams)
+                        .WithCookies(out var jar)
+                        .GetStringAsync();
+
+            _cookieJar = jar;
+        }
+
+        public async Task<string> GetCsrfTokenAsync(object queryParams)
+        {
+
+            var result = await URLs.SSO_SIGNIN_URL
+                        .WithHeader("User-Agent", MagicStrings.USER_AGENT)
+                        .WithHeader("origin", URLs.ORIGIN)
+                        .SetQueryParams(queryParams)
+                        .WithCookies(_cookieJar)
+                        .GetAsync()
+                        .ReceiveString();
+
+            return result;
+        }
+        private async Task<SendCredentialsResult> SendCredentialsAsync(object queryParams, object loginData)
+        {
+            var result = new SendCredentialsResult();
+            result.RawResponseBody = await URLs.SSO_SIGNIN_URL
+                        .WithHeader("User-Agent", MagicStrings.USER_AGENT)
+                        .WithHeader("origin", URLs.ORIGIN)
+                        .WithHeader("referer", URLs.REFERER)
+                        .WithHeader("NK", "NT")
+                        .SetQueryParams(queryParams)
+                        .WithCookies(_cookieJar)
+                        .OnRedirect((r) => { result.WasRedirected = true; result.RedirectedTo = r.Redirect.Url; })
+                        .PostUrlEncodedAsync(loginData)
+                        .ReceiveString();
+
+            return result;
+        }
 
         private async Task<(string oAuthToken, string oAuthTokenSecret)> GetOAuth1Async(string ticket)
         {
@@ -61,6 +236,11 @@ namespace YetAnotherGarminConnectClient
         public async Task SetOAuth2Token(string accessToken, string tokenSecret)
         {
             OAuth2Token = await this.GetOAuth2Token(accessToken, tokenSecret);
+
+            if(OAuth2Token != null)
+            {
+                this._oAuth2TokenValidUntil = DateTime.UtcNow.AddSeconds(OAuth2Token.Expires_In);
+            }
         }
 
         private async Task<OAuth2Token?> GetOAuth2Token(string accessToken, string tokenSecret)
@@ -95,6 +275,29 @@ namespace YetAnotherGarminConnectClient
 
             return null;
 
+        }
+
+        private string FindCsrfToken(string rawResponseBody)
+        {
+            try
+            {
+                var tokenRegex = new Regex(MagicStrings.CSRF_REGEX);
+                var match = tokenRegex.Match(rawResponseBody);
+                if (!match.Success)
+                    throw new Exception($"Failed to find regex match for csrf token. tokenResult: {rawResponseBody}");
+
+                var csrfToken = match.Groups.GetValueOrDefault("csrf")?.Value;
+                _logger.Debug($"Csrf Token: {csrfToken}");
+
+                if (string.IsNullOrWhiteSpace(csrfToken))
+                    throw new Exception("Found csrfToken but its null.");
+
+                return csrfToken;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Failed to parse csrf token.", e);
+            }
         }
     }
 }
