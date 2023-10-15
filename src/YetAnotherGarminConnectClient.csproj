@@ -4,9 +4,17 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <RepositoryUrl>https://github.com/lswiderski/yet-another-garmin-connect-client</RepositoryUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Fit.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Fit.dll" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Flurl.Http" Version="4.0.0-pre3" />
