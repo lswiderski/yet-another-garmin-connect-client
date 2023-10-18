@@ -12,6 +12,7 @@ namespace YetAnotherGarminConnectClient.Dto
         public long UploadId { get; set; }
         public IList<string> Logs { get; set; }
         public IList<string> ErrorLogs { get; set; }
+        public AuthStatus AuthStatus { get; set; }
 
     }
 }

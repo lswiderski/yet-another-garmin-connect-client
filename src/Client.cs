@@ -19,8 +19,7 @@ namespace YetAnotherGarminConnectClient
     {
         private readonly string _consumerKey;
         private readonly string _consumerSecret;
-        private string _oAuthToken = "";
-        private string _oAuthTokenSecret = "";
+        private AuthStatus _authStatus;
         CookieJar _cookieJar = null;
 
         private static readonly object _commonQueryParams = new
@@ -66,26 +65,45 @@ namespace YetAnotherGarminConnectClient
             var result = new WeightUploadResult();
             try
             {
-                var fitFile = FitFileCreator.CreateWeightBodyCompositionFitFile(weightScaleDTO, userProfileSettings);
-
-                if (!IsOAuthValid)
+                string fitFilePath = string.Empty;
+                try
                 {
-                    await this.Authenticate(weightScaleDTO.Email, weightScaleDTO.Password);
+                    fitFilePath = FitFileCreator.CreateWeightBodyCompositionFitFile(weightScaleDTO, userProfileSettings);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Problem with creating fit file");
                 }
 
-                var response = await UploadActivity(fitFile, ".fit");
-                if (response != null && response.DetailedImportResult != null)
+                if (!string.IsNullOrEmpty(fitFilePath))
                 {
-                    result.UploadId = response.DetailedImportResult.uploadId;
-                    result.IsSuccess = true;
+                    if (!IsOAuthValid)
+                    {
+                        await this.Authenticate(weightScaleDTO.Email, weightScaleDTO.Password);
+                    }
+
+                    var response = await UploadActivity(fitFilePath, ".fit");
+                    if (response != null && response.DetailedImportResult != null)
+                    {
+                        result.UploadId = response.DetailedImportResult.uploadId;
+                        result.IsSuccess = true;
+                    }
+
                 }
+
+            }
+            catch (GarminClientException ex)
+            {
+                result.AuthStatus = _authStatus;
+                _logger.Error(ex, ex.Message);
             }
             catch (Exception ex)
             {
+                result.AuthStatus = _authStatus;
                 _logger.Error(ex, ex.Message);
             }
 
-
+            result.AuthStatus = _authStatus;
             result.Logs = Logger.GetLogs();
             result.ErrorLogs = Logger.GetErrorLogs();
 

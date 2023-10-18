@@ -16,27 +16,25 @@ namespace YetAnotherGarminConnectClient
 {
     internal partial class Client : IClient
     {
-
-
         public async Task<GarminAuthenciationResult> Authenticate(string email, string password)
         {
             var result = new GarminAuthenciationResult();
             _cookieJar = null;
 
+            _authStatus = AuthStatus.PreInitCookies;
             // Set cookies
             try
             {
                 await this.InitCookieJarAsync();
             }
-
-
             catch (FlurlHttpException ex)
             {
+                _authStatus = AuthStatus.InitCookiesError;
                 this._logger.Error(ex, "Failed on first step of authentication flow. Init Cookies");
-                result.IsSuccess = false;
-                result.Error = ex.Message;
-                return result;
+                throw new GarminClientException(_authStatus, ex.Message, ex);
             }
+
+            _authStatus = AuthStatus.InitCookiesSuccessful;
 
             // get CSRF token
             var csrfRequest = new
@@ -54,15 +52,17 @@ namespace YetAnotherGarminConnectClient
             try
             {
                 var tokenResult = await this.GetCsrfTokenAsync(csrfRequest);
+                _authStatus = AuthStatus.CSRFTokenRequestSent;
                 csrfToken = this.FindCsrfToken(tokenResult);
+
             }
             catch (FlurlHttpException ex)
             {
                 this._logger.Error(ex, "Failed to fetch csrf token from Garmin.");
-                result.IsSuccess = false;
-                result.Error = ex.Message;
-                return result;
+                throw new GarminClientException(_authStatus, ex.Message, ex);
             }
+
+            _authStatus = AuthStatus.CSRFReceivedSuccessful;
 
             // send credencials
             var sendCredentialsRequest = new
@@ -84,16 +84,19 @@ namespace YetAnotherGarminConnectClient
 
                 if (responseContent == "error code: 1020")
                 {
+                    _authStatus = AuthStatus.AuthBlockedByCloudFlare;
                     var errorMessage = "Garmin Authentication Failed. Blocked by CloudFlare.";
                     this._logger.Error(ex, errorMessage);
-                    result.IsSuccess = false;
-                    result.Error = errorMessage;
-                    return result;
+                    throw new GarminClientException(_authStatus, ex.Message, ex);
                 }
+                _authStatus = AuthStatus.AuthenticationFailed;
                 this._logger.Error(ex, "Garmin Authentication Failed.");
-                result.IsSuccess = false;
-                result.Error = ex.Message;
-                return result;
+                throw new GarminClientException(_authStatus, ex.Message, ex);
+            }
+            catch (FlurlHttpException ex)
+            {
+                _authStatus = AuthStatus.AuthenticationFailedCheckCredencials;
+                throw new GarminClientException(_authStatus, ex.Message, ex);
             }
 
             var loginResult = sendCredentialsResult?.RawResponseBody;
@@ -102,11 +105,10 @@ namespace YetAnotherGarminConnectClient
             var ticketMatch = ticketRegex.Match(loginResult);
             if (!ticketMatch.Success)
             {
+                _authStatus = AuthStatus.SuccessButCouldNotFindServiceTicket;
                 var errorMessage = "Auth appeared successful but failed to find regex match for service ticket.";
                 this._logger.Error(errorMessage);
-                result.IsSuccess = false;
-                result.Error = errorMessage;
-                return result;
+                throw new GarminClientException(_authStatus, errorMessage);
             }
 
             var ticket = ticketMatch.Groups.GetValueOrDefault("ticket").Value;
@@ -114,35 +116,33 @@ namespace YetAnotherGarminConnectClient
 
             if (string.IsNullOrWhiteSpace(ticket))
             {
+                _authStatus = AuthStatus.SuccessButTicketIsEmpty;
                 var errorMessage = "Auth appeared successful, and found service ticket, but ticket was null or empty.";
                 this._logger.Error(errorMessage);
-                result.IsSuccess = false;
-                result.Error = errorMessage;
-                return result;
+                throw new GarminClientException(_authStatus, errorMessage);
             }
+            _authStatus = AuthStatus.InitialAuthSuccessful;
 
 
             // get Oauth1
             var oAuth1 = await GetOAuth1Async(ticket);
             if (string.IsNullOrEmpty(oAuth1.oAuthToken) || string.IsNullOrEmpty(oAuth1.oAuthTokenSecret))
             {
+                _authStatus = AuthStatus.OAuth1TokensAreEmpty;
                 var errorMessage = "Auth appeared successful but failed to get the OAuth1 token.";
-                result.IsSuccess = false;
-                result.Error = errorMessage;
-                return result;
+                throw new GarminClientException(_authStatus, errorMessage);
             }
 
             // set OAuth2
             await SetOAuth2Token(oAuth1.oAuthToken, oAuth1.oAuthTokenSecret);
 
-            if(OAuth2Token == null)
+            if (OAuth2Token == null)
             {
+                _authStatus = AuthStatus.OAuthToken2IsNull;
                 var errorMessage = "Auth appeared successful but failed to get the OAuth2 token.";
-                result.IsSuccess = false;
-                result.Error = errorMessage;
-                return result;
+                throw new GarminClientException(_authStatus, errorMessage);
             }
-
+            _authStatus = AuthStatus.Authenticated;
             result.IsSuccess = true;
             return result;
         }
@@ -226,7 +226,9 @@ namespace YetAnotherGarminConnectClient
             }
             catch (Exception ex)
             {
+                _authStatus = AuthStatus.OAuth1TokensProblem;
                 _logger.Error($"Error during OAuth1 handling: {ex.Message}");
+                throw new GarminClientException(_authStatus, ex.Message, ex);
             }
 
             return ("", "");
@@ -237,7 +239,7 @@ namespace YetAnotherGarminConnectClient
         {
             OAuth2Token = await this.GetOAuth2Token(accessToken, tokenSecret);
 
-            if(OAuth2Token != null)
+            if (OAuth2Token != null)
             {
                 this._oAuth2TokenValidUntil = DateTime.UtcNow.AddSeconds(OAuth2Token.Expires_In);
             }
@@ -270,7 +272,10 @@ namespace YetAnotherGarminConnectClient
             }
             catch (Exception ex)
             {
+                _authStatus = AuthStatus.OAuth2TokensProblem;
                 _logger.Error($"Error during OAuth2 handling: {ex.Message}");
+                throw new GarminClientException(_authStatus, ex.Message, ex);
+
             }
 
             return null;
@@ -284,19 +289,27 @@ namespace YetAnotherGarminConnectClient
                 var tokenRegex = new Regex(MagicStrings.CSRF_REGEX);
                 var match = tokenRegex.Match(rawResponseBody);
                 if (!match.Success)
-                    throw new Exception($"Failed to find regex match for csrf token. tokenResult: {rawResponseBody}");
+                {
+                    _authStatus = AuthStatus.CSRFTokenNotFound;
+                    throw new GarminClientException(_authStatus, $"Failed to find regex match for csrf token. tokenResult: {rawResponseBody}");
+                }
 
                 var csrfToken = match.Groups.GetValueOrDefault("csrf")?.Value;
                 _logger.Debug($"Csrf Token: {csrfToken}");
 
                 if (string.IsNullOrWhiteSpace(csrfToken))
-                    throw new Exception("Found csrfToken but its null.");
+                {
+                    _authStatus = AuthStatus.CSRFTokenNotFound;
+                    throw new GarminClientException(_authStatus, "Found csrfToken but its null.");
+                }
+
 
                 return csrfToken;
             }
             catch (Exception e)
             {
-                throw new Exception("Failed to parse csrf token.", e);
+                _authStatus = AuthStatus.CSRFTokenCannotParse;
+                throw new GarminClientException(_authStatus, "Failed to parse csrf token.", e);
             }
         }
     }

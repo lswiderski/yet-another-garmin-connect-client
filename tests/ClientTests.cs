@@ -2,6 +2,7 @@ using NLog.Targets;
 using NLog;
 using NUnit.Framework;
 using YetAnotherGarminConnectClient.Dto.Garmin.Fit;
+using YetAnotherGarminConnectClient.Dto;
 
 namespace YetAnotherGarminConnectClient.Tests
 {
@@ -74,6 +75,11 @@ namespace YetAnotherGarminConnectClient.Tests
                 isSuccess = result.IsSuccess;
 
             }
+            catch (GarminClientException ex)
+            {
+                var logs = Logger.GetLogs();
+                var errorLogs = Logger.GetErrorLogs();
+            }
             catch (Exception ex)
             {
                 var logs = Logger.GetLogs();
@@ -93,6 +99,11 @@ namespace YetAnotherGarminConnectClient.Tests
                 var result = await _client.UploadWeight(_garminWeightScaleDTO, _userProfileSettings);
                 isSuccess = result.IsSuccess;
 
+            }
+            catch (GarminClientException ex)
+            {
+                var logs = Logger.GetLogs();
+                var errorLogs = Logger.GetErrorLogs();
             }
             catch (Exception ex)
             {
