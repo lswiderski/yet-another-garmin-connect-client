@@ -64,4 +64,5 @@ app.MapPost("/upload", async (BodyCompositionRequest request) =>
     }
 });
 
-app.Run("http://*:80");
+
+app.Run();
