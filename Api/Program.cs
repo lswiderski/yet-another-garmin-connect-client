@@ -8,11 +8,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors();
 var app = builder.Build();
 
-app.UseCors(builder => builder.AllowAnyOrigin());
+app.UseCors(builder => builder
+.AllowAnyOrigin()
+.AllowAnyHeader()
+.AllowAnyMethod());
 
 app.MapGet("/", () => new
 {
-    name = "bodycomposition-webapi",
+    name = "yet-another-garmin-connect-client-api",
     projectUrl = "https://github.com/lswiderski/yet-another-garmin-connect-client",
     requestEndpoint = "/upload"
 });
@@ -42,7 +45,7 @@ app.MapPost("/upload", async (BodyCompositionRequest request) =>
             Email = request.Email,
             Password = request.Password,
         };
-        
+
         var uploadResult = await garminClient.UploadWeight(garminWeightScaleDTO, userProfileSettings);
 
         if (uploadResult.IsSuccess)
