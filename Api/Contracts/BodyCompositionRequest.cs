@@ -8,10 +8,10 @@
         public float? PercentHydration { set; get; }
         public float? BoneMass { set; get; }
         public float? MuscleMass { set; get; }
-        public byte? VisceralFatRating { set; get; }
+        public float? VisceralFatRating { set; get; }
         public float? VisceralFatMass { set; get; }
-        public byte? PhysiqueRating { set; get; }
-        public byte? MetabolicAge { set; get; }
+        public float? PhysiqueRating { set; get; }
+        public float? MetabolicAge { set; get; }
         public string Email { set; get; } = default!;
         public string Password { set; get; } = default!;
     }
