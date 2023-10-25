@@ -12,6 +12,7 @@
         public float? VisceralFatMass { set; get; }
         public float? PhysiqueRating { set; get; }
         public float? MetabolicAge { set; get; }
+        public float? bodyMassIndex { get; set; }
         public string Email { set; get; } = default!;
         public string Password { set; get; } = default!;
     }

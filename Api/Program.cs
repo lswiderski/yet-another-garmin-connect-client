@@ -42,6 +42,7 @@ app.MapPost("/upload", async (BodyCompositionRequest request) =>
             VisceralFatMass = request.VisceralFatMass,
             PhysiqueRating = request.PhysiqueRating.HasValue ? (byte)Math.Round(request.PhysiqueRating.Value) : null,
             MetabolicAge = request.MetabolicAge.HasValue ? (byte)Math.Round(request.MetabolicAge.Value) : null,
+            BodyMassIndex = request.bodyMassIndex,
             Email = request.Email,
             Password = request.Password,
         };
