@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "YAGCC": {
+      "commandName": "Project",
+      "commandLineArgs": "uploadbodycomposition --help"
+    }
+  }
+}
