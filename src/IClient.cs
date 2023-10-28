@@ -14,7 +14,8 @@ namespace YetAnotherGarminConnectClient
         public OAuth2Token OAuth2Token { get; }
         Task SetOAuth2Token(string accessToken, string tokenSecret);
         Task<GarminAuthenciationResult> Authenticate(string email, string password);
+        Task<GarminAuthenciationResult> CompleteMFAAuthAsync(string mfaCode);
         Task<UploadResponse> UploadActivity(string filePath, string format);
-        Task<WeightUploadResult> UploadWeight(GarminWeightScaleDTO weightScaleDTO, UserProfileSettings userProfileSettings);
+        Task<WeightUploadResult> UploadWeight(GarminWeightScaleDTO weightScaleDTO, UserProfileSettings userProfileSettings, string? mfaCode = "");
     }
 }

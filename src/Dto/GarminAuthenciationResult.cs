@@ -11,5 +11,6 @@ namespace YetAnotherGarminConnectClient.Dto
         public bool IsSuccess { get; set; }
         public bool Response { get; set; }
         public string Error { get; set; }
+        public bool MFACodeRequested { get; set; }
     }
 }

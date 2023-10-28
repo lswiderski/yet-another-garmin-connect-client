@@ -27,6 +27,11 @@ namespace YetAnotherGarminConnectClient.Dto
         OAuth2TokensProblem = 16,
         OAuthToken2IsNull = 17,
         Authenticated = 18,
+        MFARedirected = 19,
+        MFACSRFTokenNotFound = 20,
+        MFAAuthBlockedByCloudFlare = 21,
+        InvalidMFACode = 22,
+        
 
     }
 }

@@ -99,8 +99,37 @@ namespace YetAnotherGarminConnectClient
                 throw new GarminClientException(_authStatus, ex.Message, ex);
             }
 
+            if (sendCredentialsResult.WasRedirected && sendCredentialsResult.RedirectedTo.Contains(URLs.SSO_ENTER_MFA_URL))
+            {
+                result.MFACodeRequested = true;
+
+                _authStatus = AuthStatus.MFARedirected;
+                try
+                {
+                    var mfaCsrfToken = FindCsrfToken(sendCredentialsResult.RawResponseBody);
+                    _mfaCsrfToken = mfaCsrfToken;
+                    return result;
+
+                }
+                catch (FlurlHttpException ex)
+                {
+                    _authStatus = AuthStatus.MFACSRFTokenNotFound;
+                    this._logger.Error(ex, "Failed to fetch MFA csrf token from Garmin.");
+                    throw new GarminClientException(_authStatus, ex.Message, ex);
+                }
+
+
+            }
+
             var loginResult = sendCredentialsResult?.RawResponseBody;
 
+            return await FinishAuthenticate(loginResult);
+
+        }
+
+        public async Task<GarminAuthenciationResult> FinishAuthenticate(string loginResult)
+        {
+            GarminAuthenciationResult result = new GarminAuthenciationResult();
             var ticketRegex = new Regex(MagicStrings.TICKET_REGEX);
             var ticketMatch = ticketRegex.Match(loginResult);
             if (!ticketMatch.Success)
@@ -147,6 +176,50 @@ namespace YetAnotherGarminConnectClient
             return result;
         }
 
+        public async Task<GarminAuthenciationResult> CompleteMFAAuthAsync(string mfaCode)
+        {
+
+            if (_authStatus != AuthStatus.MFARedirected)
+            {
+                var message = "Not Redirected to MFA";
+                this._logger.Error(message);
+                throw new GarminClientException(_authStatus, message);
+            }
+
+
+            var mfaData = new List<KeyValuePair<string, string>>()
+        {
+            new KeyValuePair<string, string>("embed", "true"),
+            new KeyValuePair<string, string>("mfa-code", mfaCode),
+            new KeyValuePair<string, string>("fromPage", "setupEnterMfaCode"),
+            new KeyValuePair<string, string>("_csrf",_mfaCsrfToken)
+        };
+
+            // Send the MFA Code to Garmin
+            try
+            {
+                var mfaResponseBody = await SendMfaCodeAsync(mfaData);
+                return await FinishAuthenticate(mfaResponseBody);
+            }
+            catch (FlurlHttpException ex) when (ex.StatusCode is (int)HttpStatusCode.Forbidden)
+            {
+
+                var responseContent = (await ex.GetResponseStringAsync()) ?? string.Empty;
+
+                if (responseContent == "error code: 1020")
+                {
+                    _authStatus = AuthStatus.MFAAuthBlockedByCloudFlare;
+                    var errorMessage = "MFA: Garmin Authentication Failed. Blocked by CloudFlare.";
+                    this._logger.Error(ex, errorMessage);
+                    throw new GarminClientException(_authStatus, ex.Message, ex);
+                }
+                _authStatus = AuthStatus.InvalidMFACode;
+                this._logger.Error(ex, "MFA: Garmin Authentication Failed. MFA Code rejected by Garmin. ");
+                throw new GarminClientException(_authStatus, ex.Message, ex);
+            }
+        }
+
+
 
         private async Task InitCookieJarAsync()
         {
@@ -188,6 +261,18 @@ namespace YetAnotherGarminConnectClient
                         .ReceiveString();
 
             return result;
+        }
+
+        private Task<string> SendMfaCodeAsync(object mfaData)
+        {
+            return "https://sso.garmin.com/sso/verifyMFA/loginEnterMfaCode"
+                        .WithHeader("User-Agent", MagicStrings.USER_AGENT)
+                        .WithHeader("origin", URLs.ORIGIN)
+                        .SetQueryParams(_commonQueryParams)
+                        .WithCookies(_cookieJar)
+                        .OnRedirect(redir => redir.Request.WithCookies(_cookieJar))
+                        .PostUrlEncodedAsync(mfaData)
+                        .ReceiveString();
         }
 
         private async Task<(string oAuthToken, string oAuthTokenSecret)> GetOAuth1Async(string ticket)

@@ -13,6 +13,7 @@ namespace YetAnotherGarminConnectClient.Dto
         public IList<string> Logs { get; set; }
         public IList<string> ErrorLogs { get; set; }
         public AuthStatus AuthStatus { get; set; }
+        public bool MFACodeRequested { get; set; }
 
     }
 }

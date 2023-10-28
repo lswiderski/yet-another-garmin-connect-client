@@ -20,6 +20,7 @@ namespace YetAnotherGarminConnectClient
         private readonly string _consumerKey;
         private readonly string _consumerSecret;
         private AuthStatus _authStatus;
+        private string _mfaCsrfToken = string.Empty;
         CookieJar _cookieJar = null;
 
         private static readonly object _commonQueryParams = new
@@ -60,37 +61,39 @@ namespace YetAnotherGarminConnectClient
             }
         }
 
-        public async Task<WeightUploadResult> UploadWeight(GarminWeightScaleDTO weightScaleDTO, UserProfileSettings userProfileSettings)
+        public async Task<WeightUploadResult> UploadWeight(GarminWeightScaleDTO weightScaleDTO, UserProfileSettings userProfileSettings, string? mfaCode = "")
         {
             var result = new WeightUploadResult();
+
             try
             {
-                string fitFilePath = string.Empty;
-                try
+                if (!IsOAuthValid)
                 {
-                    fitFilePath = FitFileCreator.CreateWeightBodyCompositionFitFile(weightScaleDTO, userProfileSettings);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex, "Problem with creating fit file");
-                }
-
-                if (!string.IsNullOrEmpty(fitFilePath))
-                {
-                    if (!IsOAuthValid)
+                    if (string.IsNullOrEmpty(mfaCode))
                     {
-                        await this.Authenticate(weightScaleDTO.Email, weightScaleDTO.Password);
+                        var authResult = await this.Authenticate(weightScaleDTO.Email, weightScaleDTO.Password);
+                        if (!authResult.IsSuccess)
+                        {
+                            result.MFACodeRequested = authResult.MFACodeRequested;
+                            result.AuthStatus = _authStatus;
+                            result.Logs = Logger.GetLogs();
+                            result.ErrorLogs = Logger.GetErrorLogs();
+                            return result;
+                        }
                     }
-
-                    var response = await UploadActivity(fitFilePath, ".fit");
-                    if (response != null && response.DetailedImportResult != null)
+                    else
                     {
-                        result.UploadId = response.DetailedImportResult.uploadId;
-                        result.IsSuccess = true;
+                        var authResult = await this.CompleteMFAAuthAsync(mfaCode);
+                        if (!authResult.IsSuccess)
+                        {
+                            result.MFACodeRequested = authResult.MFACodeRequested;
+                            result.AuthStatus = _authStatus;
+                            result.Logs = Logger.GetLogs();
+                            result.ErrorLogs = Logger.GetErrorLogs();
+                            return result;
+                        }
                     }
-
                 }
-
             }
             catch (GarminClientException ex)
             {
@@ -101,6 +104,44 @@ namespace YetAnotherGarminConnectClient
             {
                 result.AuthStatus = _authStatus;
                 _logger.Error(ex, ex.Message);
+            }
+
+            if (IsOAuthValid)
+            {
+                try
+                {
+                    string fitFilePath = string.Empty;
+                    try
+                    {
+                        fitFilePath = FitFileCreator.CreateWeightBodyCompositionFitFile(weightScaleDTO, userProfileSettings);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, "Problem with creating fit file");
+                    }
+
+                    if (!string.IsNullOrEmpty(fitFilePath))
+                    {
+                        var response = await UploadActivity(fitFilePath, ".fit");
+                        if (response != null && response.DetailedImportResult != null)
+                        {
+                            result.UploadId = response.DetailedImportResult.uploadId;
+                            result.IsSuccess = true;
+                        }
+
+                    }
+
+                }
+                catch (GarminClientException ex)
+                {
+                    result.AuthStatus = _authStatus;
+                    _logger.Error(ex, ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    result.AuthStatus = _authStatus;
+                    _logger.Error(ex, ex.Message);
+                }
             }
 
             result.AuthStatus = _authStatus;

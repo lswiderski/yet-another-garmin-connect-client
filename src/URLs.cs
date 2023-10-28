@@ -17,5 +17,6 @@ namespace YetAnotherGarminConnectClient
         public static string SSO_SIGNIN_URL = "https://sso.garmin.com/sso/signin";
         public static string SSO_EMBED_URL = "https://sso.garmin.com/sso/embed";
         public static string UPLOAD_URL = "https://connectapi.garmin.com/upload-service/upload";
+        public static string SSO_ENTER_MFA_URL = "https://sso.garmin.com/sso/verifyMFA/loginEnterMfaCode";
     }
 }

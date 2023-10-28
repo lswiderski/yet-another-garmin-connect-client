@@ -39,8 +39,8 @@ namespace YetAnotherGarminConnectClient.Tests
                 VisceralFatMass = 10f,
                 PhysiqueRating = 9,
                 MetabolicAge = 28,
-                Email = "",
-                Password = "",
+                Email = _email,
+                Password = _password,
 
             };
         }
@@ -98,6 +98,74 @@ namespace YetAnotherGarminConnectClient.Tests
             {
                 var result = await _client.UploadWeight(_garminWeightScaleDTO, _userProfileSettings);
                 isSuccess = result.IsSuccess;
+
+            }
+            catch (GarminClientException ex)
+            {
+                var logs = Logger.GetLogs();
+                var errorLogs = Logger.GetErrorLogs();
+            }
+            catch (Exception ex)
+            {
+                var logs = Logger.GetLogs();
+                var errorLogs = Logger.GetErrorLogs();
+            }
+
+            Assert.IsTrue(isSuccess);
+        }
+
+
+        [Test]
+        public async Task ShouldAuthenticateWithMFA()
+        {
+            bool isSuccess = false;
+            try
+            {
+                var result = await _client.Authenticate(_email, _password);
+                if(result.MFACodeRequested)
+                {
+                    string mfaCode = "";
+
+                    // DO BREAKPOINT HERE
+                    // refplace mfaCode with proper value
+                    Thread.Sleep(1000);
+
+                    result = await _client.CompleteMFAAuthAsync(mfaCode);
+                    isSuccess = result.IsSuccess;
+                }
+            }
+            catch (GarminClientException ex)
+            {
+                var logs = Logger.GetLogs();
+                var errorLogs = Logger.GetErrorLogs();
+            }
+            catch (Exception ex)
+            {
+                var logs = Logger.GetLogs();
+                var errorLogs = Logger.GetErrorLogs();
+            }
+
+            Assert.IsTrue(isSuccess);
+        }
+
+        [Test]
+        public async Task ShouldSuccessfullUploadWeightWithMFA()
+        {
+            bool isSuccess = false;
+            try
+            {
+                var result = await _client.UploadWeight(_garminWeightScaleDTO, _userProfileSettings);
+                if (result.MFACodeRequested)
+                {
+                    string mfaCode = "";
+
+                    // DO BREAKPOINT HERE
+                    // refplace mfaCode with proper value
+                    Thread.Sleep(1000);
+
+                    result = await _client.UploadWeight(_garminWeightScaleDTO, _userProfileSettings, mfaCode);
+                    isSuccess = result.IsSuccess;
+                }
 
             }
             catch (GarminClientException ex)
