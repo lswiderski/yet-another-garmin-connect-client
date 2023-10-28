@@ -15,5 +15,7 @@
         public float? bodyMassIndex { get; set; }
         public string Email { set; get; } = default!;
         public string Password { set; get; } = default!;
+        public string? MFACode { get; set; }
+        public string? ClientID { get; set; }
     }
 }
