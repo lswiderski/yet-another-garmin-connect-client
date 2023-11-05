@@ -50,6 +50,10 @@ namespace YAGCC.Commands.UploadBodyComposition
         [Description("Set your BMI - body mass index")]
         public float? BodyMassIndex { get; set; }
 
+        [CommandOption("-t|--unix-timestamp")]
+        [Description("Time of measurement")]
+        public long? TimeStamp { set; get; }
+
         [CommandOption("-e|--email")]
         [Description("Email of the Garmin account")]
         public string? Email { set; get; }
