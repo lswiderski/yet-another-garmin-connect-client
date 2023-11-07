@@ -40,7 +40,7 @@ namespace YAGCC.Commands.UploadBodyComposition
                 };
                 var garminWeightScaleDTO = new GarminWeightScaleDTO
                 {
-                    TimeStamp = DateTime.UtcNow,
+                    TimeStamp = request.TimeStamp.HasValue ? DateTime.UnixEpoch.AddSeconds(request.TimeStamp.Value) : DateTime.UtcNow,
                     Weight = request.Weight,
                     PercentFat = request.PercentFat,
                     PercentHydration = request.PercentHydration,

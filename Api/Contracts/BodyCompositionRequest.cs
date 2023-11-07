@@ -2,7 +2,7 @@
 {
     public class BodyCompositionRequest
     {
-        public long TimeStamp { set; get; }
+        public long? TimeStamp { set; get; }
         public float Weight { set; get; }
         public float? PercentFat { set; get; }
         public float? PercentHydration { set; get; }
