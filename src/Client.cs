@@ -110,26 +110,29 @@ namespace YetAnotherGarminConnectClient
             {
                 try
                 {
-                    string fitFilePath = string.Empty;
+                    byte[] file = null;
                     try
                     {
-                        fitFilePath = FitFileCreator.CreateWeightBodyCompositionFitFile(weightScaleDTO, userProfileSettings);
+                        file = FitFileCreator.CreateWeightBodyCompositionFitFile(weightScaleDTO, userProfileSettings);
                     }
                     catch (Exception ex)
                     {
                         _logger.Error(ex, "Problem with creating fit file");
                     }
-
-                    if (!string.IsNullOrEmpty(fitFilePath))
+                    if(file == null)
                     {
-                        var response = await UploadActivity(fitFilePath, ".fit");
+                        _logger.Error("Problem with creating fit file. File empty");
+                    }
+                    else
+                    {
+                        var response = await UploadActivity(".fit", file: file);
                         if (response != null && response.DetailedImportResult != null)
                         {
                             result.UploadId = response.DetailedImportResult.uploadId;
                             result.IsSuccess = true;
                         }
-
                     }
+
 
                 }
                 catch (GarminClientException ex)
@@ -151,14 +154,15 @@ namespace YetAnotherGarminConnectClient
             return result;
         }
 
-        public async Task<UploadResponse> UploadActivity(string filePath, string format)
+        public async Task<UploadResponse> UploadActivity(string format, byte[] file)
         {
-            var fileName = Path.GetFileName(filePath);
             UploadResponse response = null;
 
             try
             {
-                response = await $"{URLs.UPLOAD_URL}/{format}"
+                using (var stream = new MemoryStream(file))
+                {
+                    response = await $"{URLs.UPLOAD_URL}/{format}"
                  .WithOAuthBearerToken(OAuth2Token.Access_Token)
                  .WithHeader("NK", "NT")
                  .WithHeader("origin", URLs.ORIGIN)
@@ -166,9 +170,12 @@ namespace YetAnotherGarminConnectClient
                  .AllowHttpStatus("2xx,409")
                  .PostMultipartAsync((data) =>
                  {
-                     data.AddFile("\"file\"", path: filePath, contentType: "application/octet-stream", fileName: $"\"{fileName}\"");
+                     var fileName = $"{DateTime.UtcNow.ToShortDateString()}_WEIGHT_SCALE.fit";
+                     data.AddFile("\"file\"", stream, contentType: "application/octet-stream", fileName: $"\"{fileName}\"");
+
                  })
                  .ReceiveJson<UploadResponse>();
+                }
             }
 
 
