@@ -37,7 +37,7 @@ app.MapPost("/upload", async (BodyCompositionRequest request, IMemoryCache memor
         };
         var garminWeightScaleDTO = new GarminWeightScaleDTO
         {
-            TimeStamp = request.TimeStamp.HasValue ? DateTime.UnixEpoch.AddSeconds(request.TimeStamp.Value) : DateTime.UtcNow,
+            TimeStamp = request.TimeStamp == null || request.TimeStamp  == -1 ? DateTime.UtcNow : DateTime.UnixEpoch.AddSeconds(request.TimeStamp.Value),
             Weight = request.Weight,
             PercentFat = request.PercentFat,
             PercentHydration = request.PercentHydration,
