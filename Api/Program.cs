@@ -18,7 +18,8 @@ app.MapGet("/", () => new
 {
     name = "yet-another-garmin-connect-client-api",
     projectUrl = "https://github.com/lswiderski/yet-another-garmin-connect-client",
-    requestEndpoint = "/upload"
+    uploadBodyCompositiontEndpoint = "/upload",
+    uploadBloodPressureEndpoint = "/uploadbloodpressure"
 });
 
 app.MapPost("/upload", async (BodyCompositionRequest request, IMemoryCache memoryCache) =>
@@ -54,6 +55,54 @@ app.MapPost("/upload", async (BodyCompositionRequest request, IMemoryCache memor
         };
 
         var uploadResult = await garminClient.UploadWeight(garminWeightScaleDTO, userProfileSettings, request.MFACode);
+
+        if (uploadResult.IsSuccess)
+        {
+            return Results.Created("/", new { uploadResult.AuthStatus });
+        }
+        if (uploadResult.MFACodeRequested)
+        {
+            var clientId = Guid.NewGuid().ToString();
+            memoryCache.Set(clientId, garminClient, TimeSpan.FromMinutes(10));
+
+            return Results.Ok(new { clientId, uploadResult.AuthStatus });
+        }
+        return Results.BadRequest($"AuthStatus: {uploadResult.AuthStatus}, Last Error log: {uploadResult.ErrorLogs.LastOrDefault()}");
+
+    }
+    catch (GarminClientException ex)
+    {
+        return Results.BadRequest($"AuthStatus: {ex.AuthStatus}, message: {ex.Message}");
+    }
+    catch (Exception ex)
+    {
+        var logs = Logger.GetLogs();
+        var errorLogs = Logger.GetErrorLogs();
+        return Results.BadRequest($"Last Error log: {errorLogs.LastOrDefault()}, message: {ex.Message}");
+    }
+});
+
+app.MapPost("/uploadbloodpressure", async (BloodPressureRequest request, IMemoryCache memoryCache) =>
+{
+    try
+    {
+        memoryCache.TryGetValue<IClient>(request.ClientID ?? "", out var garminClient);
+        if (garminClient is null)
+        {
+            garminClient = await ClientFactory.Create();
+        }
+
+        var bloodDto = new BloodPressureDataDTO
+        {
+            TimeStamp = request.TimeStamp == null || request.TimeStamp == -1 ? DateTime.UtcNow : DateTime.UnixEpoch.AddSeconds(request.TimeStamp.Value),
+            HeartRate = request.HeartRate,
+            SystolicPressure = request.SystolicPressure,
+            DiastolicPressure = request.DiastolicPressure,
+            Email = request.Email,
+            Password = request.Password,
+        };
+
+        var uploadResult = await garminClient.UploadBlood(bloodDto, request.MFACode);
 
         if (uploadResult.IsSuccess)
         {

@@ -182,5 +182,39 @@ namespace YetAnotherGarminConnectClient.Tests
             Assert.IsTrue(isSuccess);
         }
 
+        [Test]
+        public async Task ShouldSuccessfullUploadBlood()
+        {
+            bool isSuccess = false;
+            try
+            {
+                var bloodData = new BloodPressureDataDTO {
+                    HeartRate = 61,
+                    SystolicPressure = 110,
+                    DiastolicPressure = 59,
+                    TimeStamp = DateTime.UtcNow.AddHours(-3),
+                    Email = _email,
+                    Password = _password,
+                };
+
+                var result = await _client.UploadBlood(bloodData);
+                isSuccess = result.IsSuccess;
+
+            }
+            catch (GarminClientException ex)
+            {
+                var logs = Logger.GetLogs();
+                var errorLogs = Logger.GetErrorLogs();
+            }
+            catch (Exception ex)
+            {
+                var logs = Logger.GetLogs();
+                var errorLogs = Logger.GetErrorLogs();
+            }
+
+            Assert.IsTrue(isSuccess);
+        }
+
+
     }
 }

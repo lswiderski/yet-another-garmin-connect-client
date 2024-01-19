@@ -1,17 +1,7 @@
 ﻿using Flurl.Http;
 using NLog;
-using OAuth;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using YetAnotherGarminConnectClient.Dto;
 using YetAnotherGarminConnectClient.Dto.Garmin;
-using YetAnotherGarminConnectClient.Dto.Garmin.Fit;
 
 namespace YetAnotherGarminConnectClient
 {
@@ -61,99 +51,6 @@ namespace YetAnotherGarminConnectClient
             }
         }
 
-        public async Task<WeightUploadResult> UploadWeight(GarminWeightScaleDTO weightScaleDTO, UserProfileSettings userProfileSettings, string? mfaCode = "")
-        {
-            var result = new WeightUploadResult();
-
-            try
-            {
-                if (!IsOAuthValid)
-                {
-                    if (string.IsNullOrEmpty(mfaCode))
-                    {
-                        var authResult = await this.Authenticate(weightScaleDTO.Email, weightScaleDTO.Password);
-                        if (!authResult.IsSuccess)
-                        {
-                            result.MFACodeRequested = authResult.MFACodeRequested;
-                            result.AuthStatus = _authStatus;
-                            result.Logs = Logger.GetLogs();
-                            result.ErrorLogs = Logger.GetErrorLogs();
-                            return result;
-                        }
-                    }
-                    else
-                    {
-                        var authResult = await this.CompleteMFAAuthAsync(mfaCode);
-                        if (!authResult.IsSuccess)
-                        {
-                            result.MFACodeRequested = authResult.MFACodeRequested;
-                            result.AuthStatus = _authStatus;
-                            result.Logs = Logger.GetLogs();
-                            result.ErrorLogs = Logger.GetErrorLogs();
-                            return result;
-                        }
-                    }
-                }
-            }
-            catch (GarminClientException ex)
-            {
-                result.AuthStatus = _authStatus;
-                _logger.Error(ex, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                result.AuthStatus = _authStatus;
-                _logger.Error(ex, ex.Message);
-            }
-
-            if (IsOAuthValid)
-            {
-                try
-                {
-                    byte[] file = null;
-                    try
-                    {
-                        file = FitFileCreator.CreateWeightBodyCompositionFitFile(weightScaleDTO, userProfileSettings);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Error(ex, "Problem with creating fit file");
-                    }
-                    if(file == null)
-                    {
-                        _logger.Error("Problem with creating fit file. File empty");
-                    }
-                    else
-                    {
-                        var response = await UploadActivity(".fit", file: file);
-                        if (response != null && response.DetailedImportResult != null)
-                        {
-                            result.UploadId = response.DetailedImportResult.uploadId;
-                            result.IsSuccess = true;
-                        }
-                    }
-
-
-                }
-                catch (GarminClientException ex)
-                {
-                    result.AuthStatus = _authStatus;
-                    _logger.Error(ex, ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    result.AuthStatus = _authStatus;
-                    _logger.Error(ex, ex.Message);
-                }
-            }
-
-            result.AuthStatus = _authStatus;
-            result.Logs = Logger.GetLogs();
-            result.ErrorLogs = Logger.GetErrorLogs();
-
-            return result;
-        }
-
         public async Task<UploadResponse> UploadActivity(string format, byte[] file)
         {
             UploadResponse response = null;
@@ -170,7 +67,7 @@ namespace YetAnotherGarminConnectClient
                  .AllowHttpStatus("2xx,409")
                  .PostMultipartAsync((data) =>
                  {
-                     var fileName = $"{DateTime.UtcNow.ToShortDateString()}_WEIGHT_SCALE.fit";
+                     var fileName = $"{DateTime.UtcNow.ToShortDateString()}_YAGCC.fit";
                      data.AddFile("\"file\"", stream, contentType: "application/octet-stream", fileName: $"\"{fileName}\"");
 
                  })
@@ -219,5 +116,91 @@ namespace YetAnotherGarminConnectClient
             return response;
         }
 
+        private async Task<UploadResult> TryToAuthenticate(string email, string password, string? mfaCode = "")
+        {
+            var result = new UploadResult();
+            try
+            {
+                if (!IsOAuthValid)
+                {
+                    if (string.IsNullOrEmpty(mfaCode))
+                    {
+                        var authResult = await this.Authenticate(email, password);
+                        if (!authResult.IsSuccess)
+                        {
+                            result.MFACodeRequested = authResult.MFACodeRequested;
+                            result.AuthStatus = _authStatus;
+                            result.Logs = Logger.GetLogs();
+                            result.ErrorLogs = Logger.GetErrorLogs();
+                            return result;
+                        }
+                    }
+                    else
+                    {
+                        var authResult = await this.CompleteMFAAuthAsync(mfaCode);
+                        if (!authResult.IsSuccess)
+                        {
+                            result.MFACodeRequested = authResult.MFACodeRequested;
+                            result.AuthStatus = _authStatus;
+                            result.Logs = Logger.GetLogs();
+                            result.ErrorLogs = Logger.GetErrorLogs();
+                            return result;
+                        }
+                    }
+                }
+            }
+            catch (GarminClientException ex)
+            {
+                result.AuthStatus = _authStatus;
+                _logger.Error(ex, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                result.AuthStatus = _authStatus;
+                _logger.Error(ex, ex.Message);
+            }
+
+            return result;
+        }
+
+        private async Task<UploadResult> TryToUploadActivity(UploadResult result, byte[] file)
+        {
+            if (IsOAuthValid)
+            {
+                try
+                {
+                    if (file == null)
+                    {
+                        _logger.Error("Problem with creating fit file. File empty");
+                    }
+                    else
+                    {
+                        var response = await UploadActivity(".fit", file);
+                        if (response != null && response.DetailedImportResult != null)
+                        {
+                            result.UploadId = response.DetailedImportResult.uploadId;
+                            result.IsSuccess = true;
+                        }
+                    }
+
+                }
+                catch (GarminClientException ex)
+                {
+                    result.AuthStatus = _authStatus;
+                    _logger.Error(ex, ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    result.AuthStatus = _authStatus;
+                    _logger.Error(ex, ex.Message);
+                }
+            }
+
+            result.AuthStatus = _authStatus;
+            result.Logs = Logger.GetLogs();
+            result.ErrorLogs = Logger.GetErrorLogs();
+
+            return result;
+        }
     }
 }

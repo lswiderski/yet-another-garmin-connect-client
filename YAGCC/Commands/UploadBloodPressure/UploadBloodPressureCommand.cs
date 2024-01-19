@@ -4,11 +4,11 @@ using YetAnotherGarminConnectClient.Dto.Garmin.Fit;
 using YetAnotherGarminConnectClient.Dto;
 using YetAnotherGarminConnectClient;
 
-namespace YAGCC.Commands.UploadBodyComposition
+namespace YAGCC.Commands.UploadBloodPressure
 {
-    public class UploadBodyCompositionCommand : Command<UploadBodyCompositionCommandSettings>
+    public class UploadBloodPressureCommand : Command<UploadBloodPressureCommandSettings>
     {
-        public override int Execute(CommandContext context, UploadBodyCompositionCommandSettings settings)
+        public override int Execute(CommandContext context, UploadBloodPressureCommandSettings settings)
         {
             var result = Upload(settings).Result;
             AnsiConsole.MarkupLine(result);
@@ -20,37 +20,25 @@ namespace YAGCC.Commands.UploadBodyComposition
             {
                 return -1;
             }
-
         }
 
-        private async Task<string> Upload(UploadBodyCompositionCommandSettings request)
+        private async Task<string> Upload(UploadBloodPressureCommandSettings request)
         {
             try
             {
                 var garminClient = await ClientFactory.Create();
-                var userProfileSettings = new UserProfileSettings
-                {
-                    Age = 40,
-                    Height = 180,
-                };
-                var garminWeightScaleDTO = new GarminWeightScaleDTO
+
+                var bloodDto = new BloodPressureDataDTO
                 {
                     TimeStamp = request.TimeStamp.HasValue ? DateTime.UnixEpoch.AddSeconds(request.TimeStamp.Value) : DateTime.UtcNow,
-                    Weight = request.Weight,
-                    PercentFat = request.PercentFat,
-                    PercentHydration = request.PercentHydration,
-                    BoneMass = request.BoneMass,
-                    MuscleMass = request.MuscleMass,
-                    VisceralFatRating = request.VisceralFatRating.HasValue ? (byte)Math.Round(request.VisceralFatRating.Value) : null,
-                    VisceralFatMass = request.VisceralFatMass,
-                    PhysiqueRating = request.PhysiqueRating.HasValue ? (byte)Math.Round(request.PhysiqueRating.Value) : null,
-                    MetabolicAge = request.MetabolicAge.HasValue ? (byte)Math.Round(request.MetabolicAge.Value) : null,
-                    BodyMassIndex = request.BodyMassIndex,
+                    HeartRate = request.HeartRate,
+                    SystolicPressure = request.SystolicPressure,
+                    DiastolicPressure = request.DiastolicPressure,
                     Email = request.Email,
                     Password = request.Password,
                 };
 
-                var uploadResult = await garminClient.UploadWeight(garminWeightScaleDTO, userProfileSettings);
+                var uploadResult = await garminClient.UploadBlood(bloodDto);
 
                 if (uploadResult.IsSuccess)
                 {
@@ -72,3 +60,4 @@ namespace YAGCC.Commands.UploadBodyComposition
         }
     }
 }
+

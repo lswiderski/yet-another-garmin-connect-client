@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace YetAnotherGarminConnectClient.Dto
 {
-    public class WeightUploadResult
+    public class UploadResult
     {
         public bool IsSuccess { get; set; }
         public long UploadId { get; set; }

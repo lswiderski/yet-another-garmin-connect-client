@@ -42,4 +42,32 @@ namespace YetAnotherGarminConnectClient.Dto.Garmin.Fit
         public string Email { set; get; } = default!;
         public string Password { set; get; } = default!;
     }
+
+    public record BloodPressureDataDTO : BloodPressureData
+    {
+        public string Email { set; get; } = default!;
+        public string Password { set; get; } = default!;
+    }
+
+    public record BloodPressureData
+    {
+        public System.DateTime TimeStamp { set; get; }
+        //40-300
+        public ushort? SystolicPressure { set; get; }
+
+        //40-200
+        public ushort? DiastolicPressure { set; get; }
+
+        public ushort? MeanArterialPressure { set; get; }
+
+        public ushort? Map3SampleMean { set; get; }
+        public ushort? MapMorningValues { set; get; }
+        public ushort? MapEveningValues { set; get; }
+
+        //1-300
+        public byte? HeartRate { set; get; }
+        public byte? HeartRateType { set; get; }
+        public byte? Status { set; get; }
+
+    }
 }
