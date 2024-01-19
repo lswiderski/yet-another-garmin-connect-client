@@ -26,19 +26,15 @@ app.MapPost("/upload", async (BodyCompositionRequest request, IMemoryCache memor
 {
     try
     {
-        memoryCache.TryGetValue<IClient>(request.ClientID ?? "", out var garminClient);
-        if(garminClient is null)
-        {
-            garminClient = await ClientFactory.Create();
-        }
         var userProfileSettings = new UserProfileSettings
         {
             Age = 40,
             Height = 180,
         };
+
         var garminWeightScaleDTO = new GarminWeightScaleDTO
         {
-            TimeStamp = request.TimeStamp == null || request.TimeStamp  == -1 ? DateTime.UtcNow : DateTime.UnixEpoch.AddSeconds(request.TimeStamp.Value),
+            TimeStamp = request.TimeStamp == null || request.TimeStamp == -1 ? DateTime.UtcNow : DateTime.UnixEpoch.AddSeconds(request.TimeStamp.Value),
             Weight = request.Weight,
             PercentFat = request.PercentFat,
             PercentHydration = request.PercentHydration,
@@ -51,24 +47,40 @@ app.MapPost("/upload", async (BodyCompositionRequest request, IMemoryCache memor
             BodyMassIndex = request.bodyMassIndex,
             Email = request.Email,
             Password = request.Password,
-            
         };
 
-        var uploadResult = await garminClient.UploadWeight(garminWeightScaleDTO, userProfileSettings, request.MFACode);
-
-        if (uploadResult.IsSuccess)
+        if (request.CreateOnlyFile)
         {
-            return Results.Created("/", new { uploadResult.AuthStatus });
+            var fitFile = FitFileCreator.CreateWeightBodyCompositionFitFile(garminWeightScaleDTO, userProfileSettings);
+            if(fitFile == null) 
+            {
+                Results.BadRequest("Fit file is empty");
+            }
+            return Results.File(fitFile, fileDownloadName: $"Activity_{garminWeightScaleDTO.TimeStamp.ToShortDateString()}.fit");
         }
-        if (uploadResult.MFACodeRequested)
+        else
         {
-            var clientId = Guid.NewGuid().ToString();
-            memoryCache.Set(clientId, garminClient, TimeSpan.FromMinutes(10));
+            memoryCache.TryGetValue<IClient>(request.ClientID ?? "", out var garminClient);
+            if (garminClient is null)
+            {
+                garminClient = await ClientFactory.Create();
+            }
 
-            return Results.Ok(new { clientId, uploadResult.AuthStatus });
+            var uploadResult = await garminClient.UploadWeight(garminWeightScaleDTO, userProfileSettings, request.MFACode);
+
+            if (uploadResult.IsSuccess)
+            {
+                return Results.Created("/", new { uploadResult.AuthStatus });
+            }
+            if (uploadResult.MFACodeRequested)
+            {
+                var clientId = Guid.NewGuid().ToString();
+                memoryCache.Set(clientId, garminClient, TimeSpan.FromMinutes(10));
+
+                return Results.Ok(new { clientId, uploadResult.AuthStatus });
+            }
+            return Results.BadRequest($"AuthStatus: {uploadResult.AuthStatus}, Last Error log: {uploadResult.ErrorLogs.LastOrDefault()}");
         }
-        return Results.BadRequest($"AuthStatus: {uploadResult.AuthStatus}, Last Error log: {uploadResult.ErrorLogs.LastOrDefault()}");
-
     }
     catch (GarminClientException ex)
     {

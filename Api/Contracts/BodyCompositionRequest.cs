@@ -17,5 +17,6 @@
         public string Password { set; get; } = default!;
         public string? MFACode { get; set; }
         public string? ClientID { get; set; }
+        public bool CreateOnlyFile { get; set; } = false;
     }
 }
