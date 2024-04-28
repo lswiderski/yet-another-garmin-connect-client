@@ -46,11 +46,15 @@ namespace YAGCC.Commands.UploadBodyComposition
                     PhysiqueRating = request.PhysiqueRating.HasValue ? (byte)Math.Round(request.PhysiqueRating.Value) : null,
                     MetabolicAge = request.MetabolicAge.HasValue ? (byte)Math.Round(request.MetabolicAge.Value) : null,
                     BodyMassIndex = request.BodyMassIndex,
+                };
+
+                var credentials = new CredentialsData
+                {
                     Email = request.Email,
                     Password = request.Password,
                 };
 
-                var uploadResult = await garminClient.UploadWeight(garminWeightScaleDTO, userProfileSettings);
+                var uploadResult = await garminClient.UploadWeight(garminWeightScaleDTO, userProfileSettings, credentials);
 
                 if (uploadResult.IsSuccess)
                 {

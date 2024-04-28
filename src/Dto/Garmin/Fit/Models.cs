@@ -39,8 +39,6 @@ namespace YetAnotherGarminConnectClient.Dto.Garmin.Fit
 
     public record GarminWeightScaleDTO : GarminWeightScaleData
     {
-        public string Email { set; get; } = default!;
-        public string Password { set; get; } = default!;
     }
 
     public record BloodPressureDataDTO : BloodPressureData
@@ -69,5 +67,14 @@ namespace YetAnotherGarminConnectClient.Dto.Garmin.Fit
         public byte? HeartRateType { set; get; }
         public byte? Status { set; get; }
 
+    }
+
+    public record CredentialsData
+    {
+        public string Email { set; get; } = default!;
+        public string Password { set; get; } = default!;
+        public string? SerializedOAuth2Token { get; set; }
+        public string? AccessToken { get; set; }
+        public string? TokenSecret { get; set; }
     }
 }

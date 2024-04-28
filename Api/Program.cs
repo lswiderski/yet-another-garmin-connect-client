@@ -45,6 +45,10 @@ app.MapPost("/upload", async (BodyCompositionRequest request, IMemoryCache memor
             PhysiqueRating = request.PhysiqueRating.HasValue ? (byte)Math.Round(request.PhysiqueRating.Value) : null,
             MetabolicAge = request.MetabolicAge.HasValue ? (byte)Math.Round(request.MetabolicAge.Value) : null,
             BodyMassIndex = request.bodyMassIndex,
+        };
+
+        var credentials = new CredentialsData
+        {
             Email = request.Email,
             Password = request.Password,
         };
@@ -66,7 +70,7 @@ app.MapPost("/upload", async (BodyCompositionRequest request, IMemoryCache memor
                 garminClient = await ClientFactory.Create();
             }
 
-            var uploadResult = await garminClient.UploadWeight(garminWeightScaleDTO, userProfileSettings, request.MFACode);
+            var uploadResult = await garminClient.UploadWeight(garminWeightScaleDTO, userProfileSettings, credentials, request.MFACode);
 
             if (uploadResult.IsSuccess)
             {

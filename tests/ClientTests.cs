@@ -15,7 +15,7 @@ namespace YetAnotherGarminConnectClient.Tests
 
         private UserProfileSettings _userProfileSettings;
         private GarminWeightScaleDTO _garminWeightScaleDTO;
-
+        private CredentialsData _credentials;
         private IClient _client;
 
         [SetUp]
@@ -30,7 +30,7 @@ namespace YetAnotherGarminConnectClient.Tests
             _garminWeightScaleDTO = new GarminWeightScaleDTO
             {
                 TimeStamp = DateTime.UtcNow,
-                Weight = 82.1f,
+                Weight = 81.1f,
                 PercentFat = 10.1f,
                 PercentHydration = 53.3f,
                 BoneMass = 5.8f,
@@ -39,9 +39,12 @@ namespace YetAnotherGarminConnectClient.Tests
                 VisceralFatMass = 10f,
                 PhysiqueRating = 9,
                 MetabolicAge = 28,
+            };
+
+            _credentials = new CredentialsData
+            {
                 Email = _email,
                 Password = _password,
-
             };
         }
 
@@ -96,7 +99,7 @@ namespace YetAnotherGarminConnectClient.Tests
             bool isSuccess = false;
             try
             {
-                var result = await _client.UploadWeight(_garminWeightScaleDTO, _userProfileSettings);
+                var result = await _client.UploadWeight(_garminWeightScaleDTO, _userProfileSettings, _credentials);
                 isSuccess = result.IsSuccess;
 
             }
@@ -154,7 +157,7 @@ namespace YetAnotherGarminConnectClient.Tests
             bool isSuccess = false;
             try
             {
-                var result = await _client.UploadWeight(_garminWeightScaleDTO, _userProfileSettings);
+                var result = await _client.UploadWeight(_garminWeightScaleDTO, _userProfileSettings, _credentials);
                 if (result.MFACodeRequested)
                 {
                     string mfaCode = "";
@@ -163,7 +166,7 @@ namespace YetAnotherGarminConnectClient.Tests
                     // refplace mfaCode with proper value
                     Thread.Sleep(1000);
 
-                    result = await _client.UploadWeight(_garminWeightScaleDTO, _userProfileSettings, mfaCode);
+                    result = await _client.UploadWeight(_garminWeightScaleDTO, _userProfileSettings, _credentials, mfaCode);
                     isSuccess = result.IsSuccess;
                 }
 
