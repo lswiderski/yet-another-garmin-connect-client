@@ -73,7 +73,6 @@ namespace YetAnotherGarminConnectClient.Dto.Garmin.Fit
     {
         public string Email { set; get; } = default!;
         public string Password { set; get; } = default!;
-        public string? SerializedOAuth2Token { get; set; }
         public string? AccessToken { get; set; }
         public string? TokenSecret { get; set; }
     }

@@ -13,10 +13,12 @@
         public float? PhysiqueRating { set; get; }
         public float? MetabolicAge { set; get; }
         public float? bodyMassIndex { get; set; }
+        public bool CreateOnlyFile { get; set; } = false;
         public string Email { set; get; } = default!;
         public string Password { set; get; } = default!;
         public string? MFACode { get; set; }
         public string? ClientID { get; set; }
-        public bool CreateOnlyFile { get; set; } = false;
+        public string? AccessToken { get; set; }
+        public string? TokenSecret { get; set; }
     }
 }

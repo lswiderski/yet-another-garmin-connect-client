@@ -51,6 +51,8 @@ app.MapPost("/upload", async (BodyCompositionRequest request, IMemoryCache memor
         {
             Email = request.Email,
             Password = request.Password,
+            AccessToken = request.AccessToken,
+            TokenSecret = request.TokenSecret,
         };
 
         if (request.CreateOnlyFile)

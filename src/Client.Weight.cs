@@ -9,14 +9,21 @@ namespace YetAnotherGarminConnectClient
         public async Task<UploadResult> UploadWeight(GarminWeightScaleDTO weightScaleDTO, UserProfileSettings userProfileSettings, CredentialsData credentials, string? mfaCode = "")
         {
             var result = new UploadResult();
-            if (!string.IsNullOrEmpty(credentials.SerializedOAuth2Token)) {
-                var deserializedToken = JsonSerializer.Deserialize<OAuth2Token>(credentials.SerializedOAuth2Token);
-                OAuth2Token = deserializedToken;
-                this._oAuth2TokenValidUntil = DateTime.UtcNow.AddSeconds(OAuth2Token.Expires_In);
-            }
-            else if(!string.IsNullOrEmpty(credentials.AccessToken) && !string.IsNullOrEmpty(credentials.TokenSecret))
+
+            if(!string.IsNullOrEmpty(credentials.AccessToken) && !string.IsNullOrEmpty(credentials.TokenSecret) && string.IsNullOrEmpty(mfaCode))
             {
                 await SetOAuth2Token(credentials.AccessToken, credentials.TokenSecret);
+
+                if (OAuth2Token == null)
+                {
+                    _authStatus = AuthStatus.OAuthToken2IsNullFromSavedOAuth1;
+
+                }
+                else
+                {
+                    _authStatus = AuthStatus.Authenticated;
+                }
+                
             }
 
             if (!IsOAuthValid)
