@@ -28,6 +28,9 @@ namespace YetAnotherGarminConnectClient
         public OAuth2Token OAuth2Token { get; private set; }
         public DateTime _oAuth2TokenValidUntil { get; private set; }
 
+        private string _oAuth1AccessToken = string.Empty; 
+        private string _oAuth1TokenSecret = string.Empty;
+
 
         private Client() { }
         internal Client(string consumerKey, string consumerSecret)
@@ -123,29 +126,21 @@ namespace YetAnotherGarminConnectClient
             {
                 if (!IsOAuthValid)
                 {
-                    if (string.IsNullOrEmpty(mfaCode))
+
+                    var authResult = string.IsNullOrEmpty(mfaCode) 
+                        ? await this.Authenticate(email, password) 
+                        : await this.CompleteMFAAuthAsync(mfaCode);
+
+                    result.AccessToken = this._oAuth1AccessToken;
+                    result.TokenSecret = this._oAuth1TokenSecret;
+
+                    if (!authResult.IsSuccess)
                     {
-                        var authResult = await this.Authenticate(email, password);
-                        if (!authResult.IsSuccess)
-                        {
-                            result.MFACodeRequested = authResult.MFACodeRequested;
-                            result.AuthStatus = _authStatus;
-                            result.Logs = Logger.GetLogs();
-                            result.ErrorLogs = Logger.GetErrorLogs();
-                            return result;
-                        }
-                    }
-                    else
-                    {
-                        var authResult = await this.CompleteMFAAuthAsync(mfaCode);
-                        if (!authResult.IsSuccess)
-                        {
-                            result.MFACodeRequested = authResult.MFACodeRequested;
-                            result.AuthStatus = _authStatus;
-                            result.Logs = Logger.GetLogs();
-                            result.ErrorLogs = Logger.GetErrorLogs();
-                            return result;
-                        }
+                        result.MFACodeRequested = authResult.MFACodeRequested;
+                        result.AuthStatus = _authStatus;
+                        result.Logs = Logger.GetLogs();
+                        result.ErrorLogs = Logger.GetErrorLogs();
+                        return result;
                     }
                 }
             }

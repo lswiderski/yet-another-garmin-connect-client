@@ -163,6 +163,8 @@ namespace YetAnotherGarminConnectClient
                 throw new GarminClientException(_authStatus, errorMessage);
             }
 
+           
+
             // set OAuth2
             await SetOAuth2Token(oAuth1.oAuthToken, oAuth1.oAuthTokenSecret);
 
@@ -328,6 +330,8 @@ namespace YetAnotherGarminConnectClient
             if (OAuth2Token != null)
             {
                 this._oAuth2TokenValidUntil = DateTime.UtcNow.AddSeconds(OAuth2Token.Expires_In);
+                this._oAuth1AccessToken = accessToken;
+                this._oAuth1TokenSecret = tokenSecret;
             }
         }
 

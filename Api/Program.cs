@@ -76,14 +76,14 @@ app.MapPost("/upload", async (BodyCompositionRequest request, IMemoryCache memor
 
             if (uploadResult.IsSuccess)
             {
-                return Results.Created("/", new { uploadResult.AuthStatus });
+                return Results.Created("/", uploadResult);
             }
             if (uploadResult.MFACodeRequested)
             {
                 var clientId = Guid.NewGuid().ToString();
                 memoryCache.Set(clientId, garminClient, TimeSpan.FromMinutes(10));
 
-                return Results.Ok(new { clientId, uploadResult.AuthStatus });
+                return Results.Ok(new { clientId, uploadResult });
             }
             return Results.BadRequest($"AuthStatus: {uploadResult.AuthStatus}, Last Error log: {uploadResult.ErrorLogs.LastOrDefault()}");
         }

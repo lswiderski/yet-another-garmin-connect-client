@@ -14,16 +14,12 @@ namespace YetAnotherGarminConnectClient
             {
                 await SetOAuth2Token(credentials.AccessToken, credentials.TokenSecret);
 
-                if (OAuth2Token == null)
-                {
-                    _authStatus = AuthStatus.OAuthToken2IsNullFromSavedOAuth1;
+                result.AccessToken = this._oAuth1AccessToken;
+                result.TokenSecret = this._oAuth1TokenSecret;
 
-                }
-                else
-                {
-                    _authStatus = AuthStatus.Authenticated;
-                }
-                
+                _authStatus = OAuth2Token == null 
+                    ? AuthStatus.OAuthToken2IsNullFromSavedOAuth1
+                    : AuthStatus.Authenticated;
             }
 
             if (!IsOAuthValid)

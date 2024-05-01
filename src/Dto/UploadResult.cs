@@ -14,6 +14,8 @@ namespace YetAnotherGarminConnectClient.Dto
         public IList<string> ErrorLogs { get; set; }
         public AuthStatus AuthStatus { get; set; }
         public bool MFACodeRequested { get; set; }
+        public string? AccessToken { get; set; }
+        public string? TokenSecret { get; set; }
 
     }
 }
