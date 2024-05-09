@@ -76,7 +76,7 @@ app.MapPost("/upload", async (BodyCompositionRequest request, IMemoryCache memor
 
             if (uploadResult.IsSuccess)
             {
-                return Results.Created("/", uploadResult);
+                return Results.Created("/", new { uploadResult } );
             }
             if (uploadResult.MFACodeRequested)
             {
