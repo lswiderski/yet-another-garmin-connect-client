@@ -29,21 +29,26 @@ namespace YetAnotherGarminConnectClient
 
             if (IsOAuthValid)
             {
-                byte[] file = null;
-                try
-                {
-                    file = FitFileCreator.CreateWeightBodyCompositionFitFile(weightScaleDTO, userProfileSettings);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex, "Problem with creating fit file");
-                }
+                byte[] file = this.GenerateWeightFitFile(weightScaleDTO, userProfileSettings);
 
                 result = await TryToUploadActivity(result, file);
-
             }
 
             return result;
+        }
+
+        public byte[] GenerateWeightFitFile(GarminWeightScaleDTO weightScaleDTO, UserProfileSettings userProfileSettings)
+        {
+            byte[] file = null;
+            try
+            {
+                file = FitFileCreator.CreateWeightBodyCompositionFitFile(weightScaleDTO, userProfileSettings);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Problem with creating fit file");
+            }
+            return file;
         }
 
     }
