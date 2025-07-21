@@ -22,6 +22,9 @@ app.MapGet("/", () => new
     uploadBloodPressureEndpoint = "/uploadbloodpressure"
 });
 
+app.MapGet("/health", () => Results.Ok("Healthy"));
+app.MapGet("/ping", () => Results.Ok("pong"));
+
 app.MapPost("/upload", async (BodyCompositionRequest request, IMemoryCache memoryCache) =>
 {
     try
