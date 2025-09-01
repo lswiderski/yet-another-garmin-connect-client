@@ -39,6 +39,8 @@ public static class UploadEndpoints
                     };
                 }
 
+                logger.LogInformation("Using UserProfileSettings: {@UserProfileSettings}", userProfileSettings);
+
                 var garminWeightScaleDTO = new GarminWeightScaleDTO
                 {
                     TimeStamp = request.TimeStamp == null || request.TimeStamp == -1 ? DateTime.UtcNow : DateTime.UnixEpoch.AddSeconds(request.TimeStamp.Value),
