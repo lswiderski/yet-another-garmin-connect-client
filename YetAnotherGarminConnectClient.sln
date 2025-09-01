@@ -3,13 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YetAnotherGarminConnectClient", "src\YetAnotherGarminConnectClient.csproj", "{C07A15E4-C002-4AA2-A82A-504B1E8A1568}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YetAnotherGarminConnectClient.Tests", "tests\YetAnotherGarminConnectClient.Tests.csproj", "{6423FD40-D1DF-4A4A-B6C6-CCA259DF6847}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{2E21DD52-E98C-49BC-B2A4-E05C4B3271AB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YAGCC", "YAGCC\YAGCC.csproj", "{58BE670A-0FD2-4290-B13C-1809AB541174}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -18,34 +12,48 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\docker-publish.yml = .github\workflows\docker-publish.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2CAB0205-F2A3-4ED6-95B3-345F85A7D4CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YAGCC", "src\YAGCC\YAGCC.csproj", "{9CE05F89-B453-7162-941C-6B36DC739137}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YetAnotherGarminConnectClient", "src\YetAnotherGarminConnectClient\YetAnotherGarminConnectClient.csproj", "{E93992C8-472E-4348-0E73-12164BDDE6A2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F94E1FBF-3B5A-4335-8432-3ED8785AD7A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "src\Api\Api.csproj", "{CBAFC0F9-5B69-AE5B-776E-B650E010DF04}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C07A15E4-C002-4AA2-A82A-504B1E8A1568}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C07A15E4-C002-4AA2-A82A-504B1E8A1568}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C07A15E4-C002-4AA2-A82A-504B1E8A1568}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C07A15E4-C002-4AA2-A82A-504B1E8A1568}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6423FD40-D1DF-4A4A-B6C6-CCA259DF6847}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6423FD40-D1DF-4A4A-B6C6-CCA259DF6847}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6423FD40-D1DF-4A4A-B6C6-CCA259DF6847}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6423FD40-D1DF-4A4A-B6C6-CCA259DF6847}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2E21DD52-E98C-49BC-B2A4-E05C4B3271AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2E21DD52-E98C-49BC-B2A4-E05C4B3271AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2E21DD52-E98C-49BC-B2A4-E05C4B3271AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2E21DD52-E98C-49BC-B2A4-E05C4B3271AB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{58BE670A-0FD2-4290-B13C-1809AB541174}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{58BE670A-0FD2-4290-B13C-1809AB541174}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{58BE670A-0FD2-4290-B13C-1809AB541174}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{58BE670A-0FD2-4290-B13C-1809AB541174}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CE05F89-B453-7162-941C-6B36DC739137}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CE05F89-B453-7162-941C-6B36DC739137}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CE05F89-B453-7162-941C-6B36DC739137}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CE05F89-B453-7162-941C-6B36DC739137}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E93992C8-472E-4348-0E73-12164BDDE6A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E93992C8-472E-4348-0E73-12164BDDE6A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E93992C8-472E-4348-0E73-12164BDDE6A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E93992C8-472E-4348-0E73-12164BDDE6A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBAFC0F9-5B69-AE5B-776E-B650E010DF04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBAFC0F9-5B69-AE5B-776E-B650E010DF04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBAFC0F9-5B69-AE5B-776E-B650E010DF04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBAFC0F9-5B69-AE5B-776E-B650E010DF04}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{6423FD40-D1DF-4A4A-B6C6-CCA259DF6847} = {F94E1FBF-3B5A-4335-8432-3ED8785AD7A4}
 		{BF394D3C-A9CF-41BD-A009-295DB7A04546} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{9CE05F89-B453-7162-941C-6B36DC739137} = {2CAB0205-F2A3-4ED6-95B3-345F85A7D4CA}
+		{E93992C8-472E-4348-0E73-12164BDDE6A2} = {2CAB0205-F2A3-4ED6-95B3-345F85A7D4CA}
+		{CBAFC0F9-5B69-AE5B-776E-B650E010DF04} = {2CAB0205-F2A3-4ED6-95B3-345F85A7D4CA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DCA3DF59-F488-4E49-B981-DDFF63A26C71}

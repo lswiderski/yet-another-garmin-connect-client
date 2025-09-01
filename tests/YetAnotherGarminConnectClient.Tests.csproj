@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\YetAnotherGarminConnectClient.csproj" />
+    <ProjectReference Include="..\src\YetAnotherGarminConnectClient\YetAnotherGarminConnectClient.csproj" />
   </ItemGroup>
 
 </Project>
