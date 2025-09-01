@@ -56,6 +56,30 @@ public static class UploadEndpoints
 
                 logger.LogDebug("Prepared GarminWeightScaleDTO: {@GarminWeightScaleDTO}", garminWeightScaleDTO);
 
+                if (appSettings.Auth != null)
+                {
+                    if (!string.IsNullOrEmpty(appSettings.Auth.Email))
+                    {
+                        request.Email = appSettings.Auth.Email;
+                        logger.LogInformation("Using email from app settings.");
+                    }
+                    if (!string.IsNullOrEmpty(appSettings.Auth.Password))
+                    {
+                        request.Password = appSettings.Auth.Password;
+                        logger.LogInformation("Using password from app settings.");
+                    }
+                    if (!string.IsNullOrEmpty(appSettings.Auth.AccessToken))
+                    {
+                        request.AccessToken = appSettings.Auth.AccessToken;
+                        logger.LogInformation("Using access token from app settings.");
+                    }
+                    if (!string.IsNullOrEmpty(appSettings.Auth.TokenSecret))
+                    {
+                        request.TokenSecret = appSettings.Auth.TokenSecret;
+                        logger.LogInformation("Using token secret from app settings.");
+                    }
+                }
+
                 var credentials = new CredentialsData
                 {
                     Email = request.Email,
