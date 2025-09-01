@@ -6,7 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>ddedae6c-169a-4472-8728-0164451c4cd7</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-	<DockerfileTag>yet-another-garmin-connect-client-api</DockerfileTag>
+    <DockerfileTag>yet-another-garmin-connect-client-api</DockerfileTag>
+    <Version>0.1.0</Version>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

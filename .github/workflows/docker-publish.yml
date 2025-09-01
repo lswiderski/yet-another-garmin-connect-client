@@ -27,6 +27,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get project version
+        id: get_version
+        run: echo "version=$(grep -oPm1 '(?<=<Version>)[^<]+' ./src/Api/Api.csproj)" >> $GITHUB_OUTPUT
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -34,5 +38,5 @@ jobs:
           file: ./src/Api/Dockerfile
           push: true
           tags: |
+            ghcr.io/${{ github.repository_owner }}/yet-another-garmin-connect-client-api:${{ steps.get_version.outputs.version }}
             ghcr.io/${{ github.repository_owner }}/yet-another-garmin-connect-client-api:latest
-          # lswiderski/yet-another-garmin-connect-client-api:latest
