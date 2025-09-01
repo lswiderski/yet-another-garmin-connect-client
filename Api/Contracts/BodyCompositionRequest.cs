@@ -1,4 +1,6 @@
-﻿namespace Api.Contracts
+﻿using Api.Models;
+
+namespace Api.Contracts
 {
     public class BodyCompositionRequest
     {
@@ -20,5 +22,6 @@
         public string? ClientID { get; set; }
         public string? AccessToken { get; set; }
         public string? TokenSecret { get; set; }
+        public UserProfileModel? UserProfile { get; set; }
     }
 }
