@@ -33,6 +33,6 @@ jobs:
           context: ./src
           file: ./src/Api/Dockerfile
           push: true
-          tags:
-            - ghcr.io/${{ github.repository_owner }}/yet-another-garmin-connect-client-api:latest
-            # - lswiderski/yet-another-garmin-connect-client-api:latest
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/yet-another-garmin-connect-client-api:latest
+          # lswiderski/yet-another-garmin-connect-client-api:latest
