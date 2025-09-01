@@ -35,4 +35,4 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/yet-another-garmin-connect-client-api:latest
-            lswiderski/yet-another-garmin-connect-client-api:latest
+            # lswiderski/yet-another-garmin-connect-client-api:latest
