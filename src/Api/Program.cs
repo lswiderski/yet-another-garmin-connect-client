@@ -21,6 +21,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 var appSettings = app.Services.GetRequiredService<IOptions<AppSettings>>().Value;
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
 app.UseCors(builder => builder
     .AllowAnyOrigin()
@@ -44,7 +45,7 @@ app.MapBloodPressureEndpoints();
 
 if (!appSettings.General.DisableSwagger)
 {
-    // Enable Swagger middleware
+    logger.LogInformation("Swagger is enabled");
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
