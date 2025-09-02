@@ -30,7 +30,7 @@ public static class UploadEndpoints
                 {
                     Age = appSettings.UserProfileSettings.Age,
                     Height = appSettings.UserProfileSettings.Height,
-                    Gender = Enum.IsDefined(typeof(Gender), appSettings.UserProfileSettings.Gender) ? (Gender)appSettings.UserProfileSettings.Gender : Gender.Male
+                    Gender = Enum.IsDefined(typeof(Gender), (byte)appSettings.UserProfileSettings.Gender) ? (Gender)(byte)appSettings.UserProfileSettings.Gender : Gender.Male
                 };
 
                 if (request.UserProfile != null)
@@ -39,7 +39,7 @@ public static class UploadEndpoints
                     {
                         Age = request.UserProfile.Age,
                         Height = request.UserProfile.Height,
-                        Gender = Enum.IsDefined(typeof(Gender), request.UserProfile.Gender) ? (Gender)request.UserProfile.Gender : Gender.Male
+                        Gender = Enum.IsDefined(typeof(Gender), (byte)request.UserProfile.Gender) ? (Gender)(byte)request.UserProfile.Gender : Gender.Male
                     };
                     logger.LogInformation("Using UserProfileSettings from request: {@UserProfileSettings}", userProfileSettings);
                 }
