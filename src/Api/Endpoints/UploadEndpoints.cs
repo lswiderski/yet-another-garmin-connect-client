@@ -1,10 +1,12 @@
 using Api.Contracts;
 using Api.Models;
+using Dynastream.Fit;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using YetAnotherGarminConnectClient;
 using YetAnotherGarminConnectClient.Dto;
 using YetAnotherGarminConnectClient.Dto.Garmin.Fit;
+using DateTime = System.DateTime;
 
 namespace Api.Endpoints;
 
@@ -28,6 +30,7 @@ public static class UploadEndpoints
                 {
                     Age = appSettings.UserProfileSettings.Age,
                     Height = appSettings.UserProfileSettings.Height,
+                    Gender = Enum.IsDefined(typeof(Gender), appSettings.UserProfileSettings.Gender) ? (Gender)appSettings.UserProfileSettings.Gender : Gender.Male
                 };
 
                 if (request.UserProfile != null)
@@ -35,11 +38,16 @@ public static class UploadEndpoints
                     userProfileSettings = new UserProfileSettings()
                     {
                         Age = request.UserProfile.Age,
-                        Height = request.UserProfile.Height
+                        Height = request.UserProfile.Height,
+                        Gender = Enum.IsDefined(typeof(Gender), request.UserProfile.Gender) ? (Gender)request.UserProfile.Gender : Gender.Male
                     };
+                    logger.LogInformation("Using UserProfileSettings from request: {@UserProfileSettings}", userProfileSettings);
+                }
+                else
+                {
+                    logger.LogInformation("Using UserProfileSettings from AppSettings: {@UserProfileSettings}", userProfileSettings);
                 }
 
-                logger.LogInformation("Using UserProfileSettings: {@UserProfileSettings}", userProfileSettings);
 
                 var garminWeightScaleDTO = new GarminWeightScaleDTO
                 {

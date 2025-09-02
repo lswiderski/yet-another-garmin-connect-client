@@ -1,5 +1,7 @@
+using System.Reflection;
 using Api.Endpoints;
 using Api.Models;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,9 +13,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Yet Another Garmin Connect Client API", Version = "v1" });
+    // Enable XML comments
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();
+var appSettings = app.Services.GetRequiredService<IOptions<AppSettings>>().Value;
 
 app.UseCors(builder => builder
     .AllowAnyOrigin()
@@ -34,9 +41,10 @@ app.MapGet("/ping", () => Results.Ok("pong"));
 app.MapUploadEndpoints();
 app.MapBloodPressureEndpoints();
 
-// Enable Swagger middleware
-if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
+
+if (!appSettings.General.DisableSwagger)
 {
+    // Enable Swagger middleware
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
