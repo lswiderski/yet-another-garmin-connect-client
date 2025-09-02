@@ -30,7 +30,7 @@ YAGCC was created for and in my 2 other projects:
 ```yaml
 services:
   yagcc-api:
-    image: ghcr.io/chriszuercher/yet-another-garmin-connect-client-api:latest
+    image: lswiderski/yet-another-garmin-connect-client-api:latest
     container_name: yagcc
     restart: unless-stopped
     environment:
