@@ -65,6 +65,36 @@ jobs:
           git tag "v${{ steps.full_version.outputs.version }}"
           git push origin "v${{ steps.full_version.outputs.version }}"
 
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            /repos/${{ github.repository }}/releases/generate-notes \
+            -f tag_name="v${{ steps.full_version.outputs.version }}" \
+            > notes.json
+          body=$(jq -r '.body' notes.json)
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$body" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release with custom notes
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.full_version.outputs.version }}
+          name: Release v${{ steps.full_version.outputs.version }}
+          body: |
+            ## Docker Images
+      
+            [//]: - [Docker Hub](https://hub.docker.com/r/lswiderski/yet-another-garmin-connect-client-api)
+            - [GitHub Container Registry](https://ghcr.io/chriszuercher/yet-another-garmin-connect-client-api)
+      
+            ---
+      
+            ${{ steps.release_notes.outputs.body }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       #- name: Log in to Docker Hub
       #  uses: docker/login-action@v3
       #  with:
