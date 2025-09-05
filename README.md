@@ -28,13 +28,35 @@ YAGCC was created for and in my 2 other projects:
 
 ## Docker-Compose Example
 ```yaml
-version: "3.9"
-
 services:
-yagcc-api:
-    container_name: YAGCC
+  yagcc-api:
+    image: lswiderski/yet-another-garmin-connect-client-api:latest
+    container_name: yagcc
     restart: unless-stopped
-    image: lswiderski/yet-another-garmin-connect-client-api
+    environment:
+      - AppSettings__Auth__Email=your@example.com
+      - AppSettings__Auth__Password=verySecretPassword
+      - AppSettings__UserProfileSettings__Age=yourAge
+      - AppSettings__UserProfileSettings__Height=yourHeightInCm
+      - AppSettings__UserProfileSettings__Gender=1
+      - AppSettings__General__DisableSwagger=false
     ports:
-      - 80:80
+      - "8081:8080"
 ```
+
+## Configuration
+YAGCC can be configured via appsettings.json or environment variables.
+
+Supported environment variables:
+
+
+| Environment Variable                          | Example/Values                        | Description                                 |
+|-----------------------------------------------|---------------------------------------|---------------------------------------------|
+| AppSettings__Auth__Email                      | your@example.com                      | Garmin account email                        |
+| AppSettings__Auth__Password                   | verySecretPassword                    | Garmin account password                     |
+| AppSettings__Auth__AccessToken                | (token value)                         | Optional: Garmin OAuth access token         |
+| AppSettings__Auth__TokenSecret                | (token secret)                        | Optional: Garmin OAuth token secret         |
+| AppSettings__UserProfileSettings__Age         | yourAge                               | User age                                    |
+| AppSettings__UserProfileSettings__Height      | yourHeightInCm                        | User height in centimeters                  |
+| AppSettings__UserProfileSettings__Gender      | 0 for Female, 1 for Male              | User gender                                 |
+| AppSettings__General__DisableSwagger          | true / false (default: false)         | Disable Swagger UI under `/swagger`         |
