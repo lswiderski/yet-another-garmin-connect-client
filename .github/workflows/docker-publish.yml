@@ -77,6 +77,9 @@ jobs:
           echo "body<<EOF" >> $GITHUB_OUTPUT
           echo "$body" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
 
       - name: Create GitHub Release with custom notes
         uses: softprops/action-gh-release@v2
@@ -94,6 +97,7 @@ jobs:
             ${{ steps.release_notes.outputs.body }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
 
       #- name: Log in to Docker Hub
       #  uses: docker/login-action@v3
