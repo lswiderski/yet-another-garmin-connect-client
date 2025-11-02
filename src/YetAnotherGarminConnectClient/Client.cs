@@ -14,16 +14,7 @@ namespace YetAnotherGarminConnectClient
         private string _mfaCsrfToken = string.Empty;
         CookieJar _cookieJar = null;
 
-        private static readonly object _commonQueryParams = new
-        {
-            id = "gauth-widget",
-            embedWidget = "true",
-            gauthHost = URLs.SSO_EMBED_URL(_domain),
-            redirectAfterAccountCreationUrl = URLs.SSO_EMBED_URL(_domain),
-            redirectAfterAccountLoginUrl = URLs.SSO_EMBED_URL(_domain),
-            service = URLs.SSO_EMBED_URL(_domain),
-            source = URLs.SSO_EMBED_URL(_domain),
-        };
+        private readonly object _commonQueryParams;
 
         private ILogger _logger => NLog.LogManager.GetLogger("Client");
         public OAuth2Token OAuth2Token { get; private set; }
@@ -39,6 +30,16 @@ namespace YetAnotherGarminConnectClient
             _domain = domain;
             _consumerKey = consumerKey;
             _consumerSecret = consumerSecret;
+            _commonQueryParams = new
+            {
+                id = "gauth-widget",
+                embedWidget = "true",
+                gauthHost = URLs.SSO_EMBED_URL(_domain),
+                redirectAfterAccountCreationUrl = URLs.SSO_EMBED_URL(_domain),
+                redirectAfterAccountLoginUrl = URLs.SSO_EMBED_URL(_domain),
+                service = URLs.SSO_EMBED_URL(_domain),
+                source = URLs.SSO_EMBED_URL(_domain),
+            };
 
         }
 
