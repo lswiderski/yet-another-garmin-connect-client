@@ -21,12 +21,12 @@ namespace YAGCC.Commands.UploadBloodPressure
                 return -1;
             }
         }
-
         private async Task<string> Upload(UploadBloodPressureCommandSettings request)
         {
             try
             {
-                var garminClient = await ClientFactory.Create();
+                request.Server ??= "global";
+                var garminClient = await ClientFactory.Create(GarminServerHelper.GetServer(request.Server));
 
                 var bloodDto = new BloodPressureDataDTO
                 {

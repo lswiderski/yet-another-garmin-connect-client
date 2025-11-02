@@ -18,6 +18,7 @@ public class AuthOptions
     public string Password { get; set; } = string.Empty;
     public string AccessToken { get; set; } = string.Empty;
     public string TokenSecret { get; set; } = string.Empty;
+    public string Server { get; set; } = "global";
 }
 
 public class UserProfileOptions

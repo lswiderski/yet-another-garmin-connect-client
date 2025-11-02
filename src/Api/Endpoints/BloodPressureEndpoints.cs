@@ -1,5 +1,7 @@
 using Api.Contracts;
+using Api.Models;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using YetAnotherGarminConnectClient;
 using YetAnotherGarminConnectClient.Dto;
 using YetAnotherGarminConnectClient.Dto.Garmin.Fit;
@@ -13,8 +15,11 @@ public static class BloodPressureEndpoints
         app.MapPost("/uploadbloodpressure", async (
             BloodPressureRequest request,
             IMemoryCache memoryCache,
+            IOptions<AppSettings> appSettingsOpt,
             ILogger<Program> logger) =>
         {
+            var appSettings = appSettingsOpt.Value;
+
             logger.LogInformation("Received /uploadbloodpressure request for email: {Email}", request.Email);
 
             try
@@ -23,7 +28,27 @@ public static class BloodPressureEndpoints
                 if (garminClient is null)
                 {
                     logger.LogInformation("No cached client found. Creating new Garmin client.");
-                    garminClient = await ClientFactory.Create();
+                    garminClient = await ClientFactory.Create(GarminServerHelper.GetServer(request.Server));
+                }
+
+                if (appSettings.Auth != null)
+                {
+                    if (!string.IsNullOrEmpty(appSettings.Auth.Email))
+                    {
+                        request.Email = appSettings.Auth.Email;
+                        logger.LogInformation("Using email from app settings.");
+                    }
+                    if (!string.IsNullOrEmpty(appSettings.Auth.Password))
+                    {
+                        request.Password = appSettings.Auth.Password;
+                        logger.LogInformation("Using password from app settings.");
+                    }
+
+                    if (!string.IsNullOrEmpty(appSettings.Auth.Server))
+                    {
+                        request.Server = appSettings.Auth.Server;
+                        logger.LogInformation("Using server from app settings.");
+                    }
                 }
 
                 var bloodDto = new BloodPressureDataDTO
@@ -37,6 +62,8 @@ public static class BloodPressureEndpoints
                     Email = request.Email,
                     Password = request.Password,
                 };
+
+               
 
                 logger.LogDebug("Prepared BloodPressureDataDTO: {@BloodDto}", bloodDto);
 

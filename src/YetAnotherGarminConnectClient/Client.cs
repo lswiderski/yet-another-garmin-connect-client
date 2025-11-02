@@ -9,6 +9,7 @@ namespace YetAnotherGarminConnectClient
     {
         private readonly string _consumerKey;
         private readonly string _consumerSecret;
+        private readonly string _domain = URLs.GARMIN_DOMAIN_GLOBAL;
         private AuthStatus _authStatus;
         private string _mfaCsrfToken = string.Empty;
         CookieJar _cookieJar = null;
@@ -17,11 +18,11 @@ namespace YetAnotherGarminConnectClient
         {
             id = "gauth-widget",
             embedWidget = "true",
-            gauthHost = URLs.SSO_EMBED_URL,
-            redirectAfterAccountCreationUrl = URLs.SSO_EMBED_URL,
-            redirectAfterAccountLoginUrl = URLs.SSO_EMBED_URL,
-            service = URLs.SSO_EMBED_URL,
-            source = URLs.SSO_EMBED_URL,
+            gauthHost = URLs.SSO_EMBED_URL(_domain),
+            redirectAfterAccountCreationUrl = URLs.SSO_EMBED_URL(_domain),
+            redirectAfterAccountLoginUrl = URLs.SSO_EMBED_URL(_domain),
+            service = URLs.SSO_EMBED_URL(_domain),
+            source = URLs.SSO_EMBED_URL(_domain),
         };
 
         private ILogger _logger => NLog.LogManager.GetLogger("Client");
@@ -33,9 +34,9 @@ namespace YetAnotherGarminConnectClient
 
 
         private Client() { }
-        internal Client(string consumerKey, string consumerSecret)
+        internal Client(string domain, string consumerKey, string consumerSecret)
         {
-
+            _domain = domain;
             _consumerKey = consumerKey;
             _consumerSecret = consumerSecret;
 
@@ -62,10 +63,10 @@ namespace YetAnotherGarminConnectClient
             {
                 using (var stream = new MemoryStream(file))
                 {
-                    response = await $"{URLs.UPLOAD_URL}/{format}"
+                    response = await $"{URLs.UPLOAD_URL(_domain)}/{format}"
                  .WithOAuthBearerToken(OAuth2Token.Access_Token)
                  .WithHeader("NK", "NT")
-                 .WithHeader("origin", URLs.ORIGIN)
+                 .WithHeader("origin", URLs.ORIGIN(_domain))
                  .WithHeader("User-Agent", MagicStrings.USER_AGENT)
                  .AllowHttpStatus("2xx,409")
                  .PostMultipartAsync((data) =>

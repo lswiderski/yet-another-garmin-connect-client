@@ -8,14 +8,14 @@ namespace YetAnotherGarminConnectClient
     {
 
         private static ILogger _logger => NLog.LogManager.GetLogger("ClientFactory");
-        public static IClient Create(string consumerKey, string consumerSecret)
+        public static IClient Create(string domain, string consumerKey, string consumerSecret)
         {
             Logger.CreateLogger();
-            var client = new Client(consumerKey, consumerSecret);
+            var client = new Client(domain, consumerKey, consumerSecret);
             return client;
         }
 
-        public static async Task<IClient> Create()
+        public static async Task<IClient> Create(GarminServer server = GarminServer.GLOBAL)
         {
             Logger.CreateLogger();
             var keys = await URLs.GARMIN_API_CONSUMER_KEYS
@@ -29,10 +29,21 @@ namespace YetAnotherGarminConnectClient
                 
             }
             _logger.Info("Consumer Keys received");
-            var client = Create(keys.ConsumerKey, keys.ConsumerSecret);
+            string domain = GetDomain(server);
+
+            var client = Create(domain, keys.ConsumerKey, keys.ConsumerSecret);
             return client;
         }
+        private static string GetDomain(GarminServer server)
+        {
+            return server switch
+            {
+                GarminServer.GLOBAL => URLs.GARMIN_DOMAIN_GLOBAL,
+                GarminServer.CHINA => URLs.GARMIN_DOMAIN_CHINA,
+                _ => URLs.GARMIN_DOMAIN_GLOBAL,
+            };
+        }
 
-       
+
     }
 }

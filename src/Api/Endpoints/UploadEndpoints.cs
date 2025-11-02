@@ -88,6 +88,12 @@ public static class UploadEndpoints
                         request.TokenSecret = appSettings.Auth.TokenSecret;
                         logger.LogInformation("Using token secret from app settings.");
                     }
+
+                    if (!string.IsNullOrEmpty(appSettings.Auth.Server))
+                    {
+                        request.Server = appSettings.Auth.Server;
+                        logger.LogInformation("Using server from app settings.");
+                    }
                 }
 
                 var credentials = new CredentialsData
@@ -116,7 +122,7 @@ public static class UploadEndpoints
                     if (garminClient is null)
                     {
                         logger.LogInformation("No cached client found. Creating new Garmin client.");
-                        garminClient = await ClientFactory.Create();
+                        garminClient = await ClientFactory.Create(GarminServerHelper.GetServer(request.Server));
                     }
 
                     var uploadResult = await garminClient.UploadWeight(garminWeightScaleDTO, userProfileSettings, credentials, request.MFACode);

@@ -42,11 +42,11 @@ namespace YetAnotherGarminConnectClient
             {
                 id = "gauth-widget",
                 embedWidget = "true",
-                gauthHost = URLs.SSO_EMBED_URL,
-                service = URLs.SSO_EMBED_URL,
-                source = URLs.SSO_EMBED_URL,
-                redirectAfterAccountLoginUrl = URLs.SSO_EMBED_URL,
-                redirectAfterAccountCreationUrl = URLs.SSO_EMBED_URL,
+                gauthHost = URLs.SSO_EMBED_URL(_domain),
+                service = URLs.SSO_EMBED_URL(_domain),
+                source = URLs.SSO_EMBED_URL(_domain),
+                redirectAfterAccountLoginUrl = URLs.SSO_EMBED_URL(_domain),
+                redirectAfterAccountCreationUrl = URLs.SSO_EMBED_URL(_domain),
             };
 
             string csrfToken = string.Empty;
@@ -100,7 +100,7 @@ namespace YetAnotherGarminConnectClient
                 throw new GarminClientException(_authStatus, ex.Message, ex);
             }
 
-            if (sendCredentialsResult.WasRedirected && sendCredentialsResult.RedirectedTo.Contains(URLs.SSO_ENTER_MFA_URL))
+            if (sendCredentialsResult.WasRedirected && sendCredentialsResult.RedirectedTo.Contains(URLs.SSO_ENTER_MFA_URL(_domain)))
             {
                 result.MFACodeRequested = true;
 
@@ -226,9 +226,9 @@ namespace YetAnotherGarminConnectClient
 
         private async Task InitCookieJarAsync()
         {
-            await URLs.SSO_EMBED_URL
+            await URLs.SSO_EMBED_URL(_domain)
                         .WithHeader("User-Agent", MagicStrings.USER_AGENT)
-                        .WithHeader("origin", URLs.ORIGIN)
+                        .WithHeader("origin", URLs.ORIGIN(_domain))
                         .SetQueryParams(_commonQueryParams)
                         .WithCookies(out var jar)
                         .GetStringAsync();
@@ -239,9 +239,9 @@ namespace YetAnotherGarminConnectClient
         public async Task<string> GetCsrfTokenAsync(object queryParams)
         {
 
-            var result = await URLs.SSO_SIGNIN_URL
+            var result = await URLs.SSO_SIGNIN_URL(_domain)
                         .WithHeader("User-Agent", MagicStrings.USER_AGENT)
-                        .WithHeader("origin", URLs.ORIGIN)
+                        .WithHeader("origin", URLs.ORIGIN(_domain))
                         .SetQueryParams(queryParams)
                         .WithCookies(_cookieJar)
                         .GetAsync()
@@ -252,10 +252,10 @@ namespace YetAnotherGarminConnectClient
         private async Task<SendCredentialsResult> SendCredentialsAsync(object queryParams, object loginData)
         {
             var result = new SendCredentialsResult();
-            result.RawResponseBody = await URLs.SSO_SIGNIN_URL
+            result.RawResponseBody = await URLs.SSO_SIGNIN_URL(_domain)
                         .WithHeader("User-Agent", MagicStrings.USER_AGENT)
-                        .WithHeader("origin", URLs.ORIGIN)
-                        .WithHeader("referer", URLs.REFERER)
+                        .WithHeader("origin", URLs.ORIGIN(_domain))
+                        .WithHeader("referer", URLs.REFERER(_domain))
                         .WithHeader("NK", "NT")
                         .SetQueryParams(queryParams)
                         .WithCookies(_cookieJar)
@@ -270,7 +270,7 @@ namespace YetAnotherGarminConnectClient
         {
             return "https://sso.garmin.com/sso/verifyMFA/loginEnterMfaCode"
                         .WithHeader("User-Agent", MagicStrings.USER_AGENT)
-                        .WithHeader("origin", URLs.ORIGIN)
+                        .WithHeader("origin", URLs.ORIGIN(_domain))
                         .SetQueryParams(_commonQueryParams)
                         .WithCookies(_cookieJar)
                         .OnRedirect(redir => redir.Request.WithCookies(_cookieJar))
@@ -282,7 +282,7 @@ namespace YetAnotherGarminConnectClient
         {
 
             OAuthRequest oauthRequest = OAuthRequest.ForRequestToken(_consumerKey, _consumerSecret);
-            oauthRequest.RequestUrl = URLs.OAUTH1_URL(ticket);
+            oauthRequest.RequestUrl = URLs.OAUTH1_URL(ticket,_domain);
             string authHeader = oauthRequest.GetAuthorizationHeader();
             try
             {
@@ -340,7 +340,7 @@ namespace YetAnotherGarminConnectClient
 
             OAuthRequest oauthRequest = OAuthRequest.ForProtectedResource("POST", _consumerKey, _consumerSecret, accessToken, tokenSecret);
 
-            oauthRequest.RequestUrl = URLs.OAUTH_EXCHANGE_URL;
+            oauthRequest.RequestUrl = URLs.OAUTH_EXCHANGE_URL(_domain);
             string authHeader = oauthRequest.GetAuthorizationHeader();
 
             try

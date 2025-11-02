@@ -12,5 +12,6 @@ namespace Api.Contracts
         public string Password { set; get; } = default!;
         public string? MFACode { get; set; }
         public string? ClientID { get; set; }
+        public string? Server { get; set; }
     }
 }

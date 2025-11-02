@@ -22,6 +22,7 @@ namespace Api.Contracts
         public string? ClientID { get; set; }
         public string? AccessToken { get; set; }
         public string? TokenSecret { get; set; }
+        public string? Server { get; set; }
         public UserProfileModel? UserProfile { get; set; }
     }
 }

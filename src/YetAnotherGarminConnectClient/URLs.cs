@@ -10,13 +10,15 @@ namespace YetAnotherGarminConnectClient
     public static class URLs
     {
         public static string GARMIN_API_CONSUMER_KEYS = "https://github.com/lswiderski/yet-another-garmin-connect-client/raw/main/oauth_consumer.json";
-        public static string OAUTH_EXCHANGE_URL = "https://connectapi.garmin.com/oauth-service/oauth/exchange/user/2.0";
-        public static string OAUTH1_URL(string ticket) => $"https://connectapi.garmin.com/oauth-service/oauth/preauthorized?ticket={ticket}&login-url=https://sso.garmin.com/sso/embed&accepts-mfa-tokens=true";
-        public static string ORIGIN = "https://sso.garmin.com";
-        public static string REFERER = "https://sso.garmin.com/sso/signin";
-        public static string SSO_SIGNIN_URL = "https://sso.garmin.com/sso/signin";
-        public static string SSO_EMBED_URL = "https://sso.garmin.com/sso/embed";
-        public static string UPLOAD_URL = "https://connectapi.garmin.com/upload-service/upload";
-        public static string SSO_ENTER_MFA_URL = "https://sso.garmin.com/sso/verifyMFA/loginEnterMfaCode";
+        public static string OAUTH_EXCHANGE_URL(string domain) => $"https://connectapi.{domain}/oauth-service/oauth/exchange/user/2.0";
+        public static string OAUTH1_URL(string ticket, string domain) => $"https://connectapi.{domain}/oauth-service/oauth/preauthorized?ticket={ticket}&login-url=https://sso.{domain}/sso/embed&accepts-mfa-tokens=true";
+        public static string ORIGIN(string domain) => $"https://sso.{domain}";
+        public static string REFERER(string domain) => $"https://sso.{domain}/sso/signin";
+        public static string SSO_SIGNIN_URL(string domain) => $"https://sso.{domain}/sso/signin";
+        public static string SSO_EMBED_URL(string domain) => $"https://sso.{domain}/sso/embed";
+        public static string UPLOAD_URL(string domain) => $"https://connectapi.{domain}/upload-service/upload";
+        public static string SSO_ENTER_MFA_URL(string domain) => $"https://sso.{domain}/sso/verifyMFA/loginEnterMfaCode";
+        public static string GARMIN_DOMAIN_GLOBAL = "garmin.com";
+        public static string GARMIN_DOMAIN_CHINA = "garmin.cn";
     }
 }

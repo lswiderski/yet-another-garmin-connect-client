@@ -27,7 +27,9 @@ namespace YAGCC.Commands.UploadBodyComposition
         {
             try
             {
-                var garminClient = await ClientFactory.Create();
+                request.Server ??= "global";
+
+                var garminClient = await ClientFactory.Create(GarminServerHelper.GetServer(request.Server));
                 var userProfileSettings = new UserProfileSettings
                 {
                     Age = 40,
