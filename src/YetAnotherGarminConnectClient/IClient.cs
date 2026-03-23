@@ -13,6 +13,7 @@ namespace YetAnotherGarminConnectClient
     {
         public OAuth2Token OAuth2Token { get; }
         Task SetOAuth2Token(string accessToken, string tokenSecret);
+        Task SetJWTToken(string accessToken);
         Task<GarminAuthenciationResult> Authenticate(string email, string password);
         Task<GarminAuthenciationResult> CompleteMFAAuthAsync(string mfaCode);
         Task<UploadResponse> UploadActivity(string format, byte[] file);

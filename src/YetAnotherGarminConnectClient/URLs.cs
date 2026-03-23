@@ -10,12 +10,20 @@ namespace YetAnotherGarminConnectClient
     public static class URLs
     {
         public static string GARMIN_API_CONSUMER_KEYS = "https://github.com/lswiderski/yet-another-garmin-connect-client/raw/main/oauth_consumer.json";
+
+        // Mobile API endpoints
+        public static string SSO_MOBILE_SIGNIN_URL(string domain) => $"https://sso.{domain}/mobile/sso/en/sign-in";
+        public static string SSO_MOBILE_LOGIN_URL(string domain) => $"https://sso.{domain}/mobile/api/login";
+        public static string SSO_MOBILE_MFA_URL(string domain) => $"https://sso.{domain}/mobile/api/mfa/verifyCode";
+
+        // Web API endpoints
         public static string OAUTH_EXCHANGE_URL(string domain) => $"https://connectapi.{domain}/oauth-service/oauth/exchange/user/2.0";
         public static string OAUTH1_URL(string ticket, string domain) => $"https://connectapi.{domain}/oauth-service/oauth/preauthorized?ticket={ticket}&login-url=https://sso.{domain}/sso/embed&accepts-mfa-tokens=true";
         public static string ORIGIN(string domain) => $"https://sso.{domain}";
         public static string REFERER(string domain) => $"https://sso.{domain}/sso/signin";
         public static string SSO_SIGNIN_URL(string domain) => $"https://sso.{domain}/sso/signin";
         public static string SSO_EMBED_URL(string domain) => $"https://sso.{domain}/sso/embed";
+        public static string SSO_MFA_URL(string domain) => $"https://sso.{domain}/sso/verifyMFA/loginEnterMfaCode";
         public static string UPLOAD_URL(string domain) => $"https://connectapi.{domain}/upload-service/upload";
         public static string SSO_ENTER_MFA_URL(string domain) => $"https://sso.{domain}/sso/verifyMFA/loginEnterMfaCode";
         public static string GARMIN_DOMAIN_GLOBAL = "garmin.com";

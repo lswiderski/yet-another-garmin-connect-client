@@ -12,6 +12,7 @@ namespace YetAnotherGarminConnectClient
         private readonly string _domain = URLs.GARMIN_DOMAIN_GLOBAL;
         private AuthStatus _authStatus;
         private string _mfaCsrfToken = string.Empty;
+        private string _CsrfToken = string.Empty;
         CookieJar _cookieJar = null;
 
         private readonly object _commonQueryParams;
