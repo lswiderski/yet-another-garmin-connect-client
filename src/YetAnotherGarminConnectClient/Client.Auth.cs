@@ -74,6 +74,8 @@ namespace YetAnotherGarminConnectClient
                 _csrf = csrfToken
             };
 
+            int randomDelay = new Random().Next(5, 10);
+            Thread.Sleep(randomDelay * 1000); // Sleep for a second to avoid hitting Garmin too fast, which can cause issues with the next request
             SendCredentialsResult sendCredentialsResult = null;
             try
             {
@@ -97,6 +99,11 @@ namespace YetAnotherGarminConnectClient
             catch (FlurlHttpException ex)
             {
                 _authStatus = AuthStatus.AuthenticationFailedCheckCredencials;
+                if(ex.StatusCode == (int)HttpStatusCode.TooManyRequests)
+                {
+                    _authStatus = AuthStatus.AuthBlockedByCloudFlare;
+                }
+                this._logger.Error(ex, "Garmin Authentication Failed.");
                 throw new GarminClientException(_authStatus, ex.Message, ex);
             }
 
@@ -153,6 +160,8 @@ namespace YetAnotherGarminConnectClient
             }
             _authStatus = AuthStatus.InitialAuthSuccessful;
 
+            int randomDelay = new Random().Next(5, 10);
+            Thread.Sleep(randomDelay * 1000); // Sleep for a second to avoid hitting Garmin too fast, which can cause issues with the next request
 
             // get Oauth1
             var oAuth1 = await GetOAuth1Async(ticket);
