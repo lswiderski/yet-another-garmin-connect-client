@@ -33,7 +33,9 @@ app.MapGet("/", () => new
     name = "yet-another-garmin-connect-client-api",
     projectUrl = "https://github.com/lswiderski/yet-another-garmin-connect-client",
     uploadBodyCompositiontEndpoint = "/upload",
-    uploadBloodPressureEndpoint = "/uploadbloodpressure"
+    uploadBloodPressureEndpoint = "/uploadbloodpressure",
+    version = typeof(Program).Assembly.GetName().Version?.ToString() ?? "Unknown"
+
 });
 
 app.MapGet("/health", () => Results.Ok("Healthy"));
@@ -54,3 +56,5 @@ if (!appSettings.General.DisableSwagger)
 }
 
 app.Run();
+
+public partial class Program { }
