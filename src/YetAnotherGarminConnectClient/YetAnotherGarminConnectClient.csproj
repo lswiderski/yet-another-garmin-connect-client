@@ -19,6 +19,7 @@
   <ItemGroup>
     <PackageReference Include="Flurl.Http" Version="4.0.0-pre3" />
     <PackageReference Include="Garmin.FIT.Sdk" Version="21.171.0" />
+    <PackageReference Include="HttpCloak" Version="1.6.5" />
     <PackageReference Include="NLog" Version="5.2.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.4" />
     <PackageReference Include="OAuth.DotNetCore" Version="3.0.1" />
