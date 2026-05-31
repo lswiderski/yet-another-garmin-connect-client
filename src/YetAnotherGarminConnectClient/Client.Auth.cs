@@ -50,6 +50,9 @@ namespace YetAnotherGarminConnectClient
             };
 
             string csrfToken = string.Empty;
+
+            int randomDelay = new Random().Next(10, 16);
+            Thread.Sleep(randomDelay * 1000); // Sleep for a second to avoid hitting Garmin too fast, which can cause issues with the next request
             try
             {
                 var tokenResult = await this.GetCsrfTokenAsync(csrfRequest);
@@ -74,7 +77,7 @@ namespace YetAnotherGarminConnectClient
                 _csrf = csrfToken
             };
 
-            int randomDelay = new Random().Next(5, 10);
+            randomDelay = new Random().Next(10, 16);
             Thread.Sleep(randomDelay * 1000); // Sleep for a second to avoid hitting Garmin too fast, which can cause issues with the next request
             SendCredentialsResult sendCredentialsResult = null;
             try
@@ -160,7 +163,7 @@ namespace YetAnotherGarminConnectClient
             }
             _authStatus = AuthStatus.InitialAuthSuccessful;
 
-            int randomDelay = new Random().Next(5, 10);
+            int randomDelay = new Random().Next(10, 16);
             Thread.Sleep(randomDelay * 1000); // Sleep for a second to avoid hitting Garmin too fast, which can cause issues with the next request
 
             // get Oauth1
@@ -172,7 +175,8 @@ namespace YetAnotherGarminConnectClient
                 throw new GarminClientException(_authStatus, errorMessage);
             }
 
-           
+            randomDelay = new Random().Next(10, 16);
+            Thread.Sleep(randomDelay * 1000); // Sleep for a second to avoid hitting Garmin too fast, which can cause issues with the next request
 
             // set OAuth2
             await SetOAuth2Token(oAuth1.oAuthToken, oAuth1.oAuthTokenSecret);
