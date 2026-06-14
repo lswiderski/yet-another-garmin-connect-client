@@ -34,7 +34,7 @@ namespace YAGCC.Commands.UploadBloodPressure
         [Description("Password of the Garmin account")]
         public string? Password { set; get; }
 
-        [CommandOption("-s|--server")]
+        [CommandOption("--server")]
         [Description("Server of the Gamin API: global or china")]
         public string? Server { set; get; }
     }
