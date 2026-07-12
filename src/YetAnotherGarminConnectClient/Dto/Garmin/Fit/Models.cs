@@ -29,7 +29,20 @@ namespace YetAnotherGarminConnectClient.Dto.Garmin.Fit
         public float? PercentFat { set; get; }
         public float? PercentHydration { set; get; }
         public float? BoneMass { set; get; }
-        public float? MuscleMass { set; get; }
+        /// <summary>
+        /// Skeletal muscle mass in kilograms. Garmin's FIT profile names this field muscle_mass.
+        /// </summary>
+        public float? SkeletalMuscleMass { set; get; }
+
+        /// <summary>
+        /// Backwards-compatible alias for <see cref="SkeletalMuscleMass"/>.
+        /// </summary>
+        [Obsolete("Use SkeletalMuscleMass. Garmin's muscle_mass FIT field represents skeletal muscle mass.")]
+        public float? MuscleMass
+        {
+            get => SkeletalMuscleMass;
+            set => SkeletalMuscleMass = value;
+        }
         public byte? VisceralFatRating { set; get; }
         public float? VisceralFatMass { set; get; }
         public byte? PhysiqueRating { set; get; }

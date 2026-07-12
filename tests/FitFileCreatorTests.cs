@@ -8,13 +8,13 @@ namespace YetAnotherGarminConnectClient.Tests;
 public class FitFileCreatorTests
 {
     [Test]
-    public void WeightFitFileRoundTripsBasalMetAndMuscleMass()
+    public void WeightFitFileRoundTripsBasalMetAndSkeletalMuscleMass()
     {
         var data = new GarminWeightScaleData
         {
             TimeStamp = new System.DateTime(2026, 7, 12, 8, 30, 0, DateTimeKind.Utc),
             Weight = 74.2f,
-            MuscleMass = 40.0f,
+            SkeletalMuscleMass = 40.0f,
             BasalMet = 1650f,
         };
         var profile = new UserProfileSettings { Age = 29, Height = 182 };
@@ -57,5 +57,15 @@ public class FitFileCreatorTests
         Assert.That(decode.Read(stream), Is.True);
         Assert.That(decoded, Is.Not.Null);
         Assert.That(decoded!.GetBasalMet(), Is.Null);
+    }
+
+    [Test]
+    public void LegacyMuscleMassAliasPopulatesSkeletalMuscleMass()
+    {
+#pragma warning disable CS0618
+        var data = new GarminWeightScaleData { MuscleMass = 39.5f };
+#pragma warning restore CS0618
+
+        Assert.That(data.SkeletalMuscleMass, Is.EqualTo(39.5f));
     }
 }

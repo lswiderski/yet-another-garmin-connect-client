@@ -34,7 +34,7 @@ namespace YetAnotherGarminConnectClient.Tests
                 PercentFat = 10.1f,
                 PercentHydration = 53.3f,
                 BoneMass = 5.8f,
-                MuscleMass = 32f,
+                SkeletalMuscleMass = 32f,
                 VisceralFatRating = 9,
                 VisceralFatMass = 10f,
                 PhysiqueRating = 9,

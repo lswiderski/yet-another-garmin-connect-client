@@ -9,6 +9,9 @@ namespace Api.Contracts
         public float? PercentFat { set; get; }
         public float? PercentHydration { set; get; }
         public float? BoneMass { set; get; }
+        public float? SkeletalMuscleMass { set; get; }
+
+        // Retained so older proxy clients continue to upload this value.
         public float? MuscleMass { set; get; }
         public float? VisceralFatRating { set; get; }
         public float? VisceralFatMass { set; get; }

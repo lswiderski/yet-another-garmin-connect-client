@@ -35,7 +35,7 @@ namespace Api.Tests.Helpers
                 PercentFat = 20.5f,
                 PercentHydration = 55.0f,
                 BoneMass = 3.2f,
-                MuscleMass = 30.0f,
+                SkeletalMuscleMass = 30.0f,
                 VisceralFatRating = 5,
                 VisceralFatMass = 2.5f,
                 PhysiqueRating = 3,

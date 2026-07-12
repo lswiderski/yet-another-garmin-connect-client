@@ -52,8 +52,8 @@ namespace YetAnotherGarminConnectClient
                     weightMesg.SetPercentFat(garminWeightScaleData.PercentFat);
                 if (garminWeightScaleData.PercentHydration is not null)
                     weightMesg.SetPercentHydration(garminWeightScaleData.PercentHydration);
-                if (garminWeightScaleData.MuscleMass is not null)
-                    weightMesg.SetMuscleMass(garminWeightScaleData.MuscleMass);
+                if (garminWeightScaleData.SkeletalMuscleMass is not null)
+                    weightMesg.SetMuscleMass(garminWeightScaleData.SkeletalMuscleMass);
                 if (garminWeightScaleData.BasalMet is not null)
                     weightMesg.SetBasalMet(garminWeightScaleData.BasalMet);
                 if (garminWeightScaleData.BoneMass is not null)

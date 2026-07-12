@@ -56,7 +56,7 @@ public static class UploadEndpoints
                     PercentFat = request.PercentFat,
                     PercentHydration = request.PercentHydration,
                     BoneMass = request.BoneMass,
-                    MuscleMass = request.MuscleMass,
+                    SkeletalMuscleMass = request.SkeletalMuscleMass ?? request.MuscleMass,
                     VisceralFatRating = request.VisceralFatRating.HasValue ? (byte)Math.Round(request.VisceralFatRating.Value) : null,
                     VisceralFatMass = request.VisceralFatMass,
                     PhysiqueRating = request.PhysiqueRating.HasValue ? (byte)Math.Round(request.PhysiqueRating.Value) : null,

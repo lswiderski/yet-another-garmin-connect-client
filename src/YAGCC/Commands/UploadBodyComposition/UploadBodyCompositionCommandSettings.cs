@@ -26,9 +26,9 @@ namespace YAGCC.Commands.UploadBodyComposition
         [Description("Set your bone mass in kilograms")]
         public float? BoneMass { set; get; }
 
-        [CommandOption("-m|--muscle-mass")]
-        [Description("Set your muscle mass in kilograms")]
-        public float? MuscleMass { set; get; }
+        [CommandOption("-m|--skeletal-muscle-mass|--muscle-mass")]
+        [Description("Set your skeletal muscle mass in kilograms")]
+        public float? SkeletalMuscleMass { set; get; }
 
         [CommandOption("--visceral-fat")]
         [Description("Set your visceral fat rating")]
