@@ -62,6 +62,7 @@ public static class UploadEndpoints
                     PhysiqueRating = request.PhysiqueRating.HasValue ? (byte)Math.Round(request.PhysiqueRating.Value) : null,
                     MetabolicAge = request.MetabolicAge.HasValue ? (byte)Math.Round(request.MetabolicAge.Value) : null,
                     BodyMassIndex = request.bodyMassIndex,
+                    BasalMet = request.BasalMet,
                 };
 
                 logger.LogDebug("Prepared GarminWeightScaleDTO: {@GarminWeightScaleDTO}", garminWeightScaleDTO);

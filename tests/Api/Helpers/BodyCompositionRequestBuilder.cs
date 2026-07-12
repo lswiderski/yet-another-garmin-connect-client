@@ -41,6 +41,7 @@ namespace Api.Tests.Helpers
                 PhysiqueRating = 3,
                 MetabolicAge = 35,
                 bodyMassIndex = 24.5f,
+                BasalMet = 1650f,
                 TimeStamp = null,
                 CreateOnlyFile = false
             };

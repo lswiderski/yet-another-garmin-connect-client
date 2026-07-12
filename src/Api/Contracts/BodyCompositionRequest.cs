@@ -15,6 +15,7 @@ namespace Api.Contracts
         public float? PhysiqueRating { set; get; }
         public float? MetabolicAge { set; get; }
         public float? bodyMassIndex { get; set; }
+        public float? BasalMet { get; set; }
         public bool CreateOnlyFile { get; set; } = false;
         public string Email { set; get; } = default!;
         public string Password { set; get; } = default!;

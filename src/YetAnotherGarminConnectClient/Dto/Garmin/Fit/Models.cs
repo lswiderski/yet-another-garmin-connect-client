@@ -35,6 +35,7 @@ namespace YetAnotherGarminConnectClient.Dto.Garmin.Fit
         public byte? PhysiqueRating { set; get; }
         public byte? MetabolicAge { set; get; }
         public float? BodyMassIndex { set; get; }
+        public float? BasalMet { set; get; }
     }
 
     public record GarminWeightScaleDTO : GarminWeightScaleData
