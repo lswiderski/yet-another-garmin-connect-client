@@ -19,5 +19,6 @@ namespace YetAnotherGarminConnectClient
         Task<UploadResult> UploadWeight(GarminWeightScaleDTO weightScaleDTO, UserProfileSettings userProfileSettings, CredentialsData credentials, string? mfaCode = "");
         byte[] GenerateWeightFitFile(GarminWeightScaleDTO weightScaleDTO, UserProfileSettings userProfileSettings);
         Task<UploadResult> UploadBlood(BloodPressureDataDTO bloodPressureData, string? mfaCode = "");
+        Task<RequestResult> GetSocialProfile(CredentialsData credentials, string? mfaCode = "");
     }
 }

@@ -97,11 +97,13 @@ namespace YetAnotherGarminConnectClient
             _logger = logger;
 
             // Configure Flurl
-            FlurlHttp.ConfigureClient(domain, builder =>
-            {
-                builder.WithTimeout(TimeSpan.FromSeconds(30));
-                builder.WithAutoRedirect(true);
-            });
+           // FlurlHttp.ConfigureClient(domain, builder =>
+           // {
+           //     builder.WithTimeout(TimeSpan.FromSeconds(30));
+           //     builder.WithAutoRedirect(true);
+           // });
+
+            FlurlHttp.ConfigureClientForUrl(domain).WithTimeout(TimeSpan.FromSeconds(30)).WithAutoRedirect(true).Build();
         }
 
 

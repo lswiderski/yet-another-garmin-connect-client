@@ -17,6 +17,7 @@ namespace YetAnotherGarminConnectClient
         public static string SSO_SIGNIN_URL(string domain) => $"https://sso.{domain}/sso/signin";
         public static string SSO_EMBED_URL(string domain) => $"https://sso.{domain}/sso/embed";
         public static string UPLOAD_URL(string domain) => $"https://connectapi.{domain}/upload-service/upload";
+        public static string SOCIAL_PROFILE_URL(string domain) => $"https://connectapi.{domain}/userprofile-service/socialProfile";
         public static string SSO_ENTER_MFA_URL(string domain) => $"https://sso.{domain}/sso/verifyMFA/loginEnterMfaCode";
         public static string GARMIN_DOMAIN_GLOBAL = "garmin.com";
         public static string GARMIN_DOMAIN_CHINA = "garmin.cn";
