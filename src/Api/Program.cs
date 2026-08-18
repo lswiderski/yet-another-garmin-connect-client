@@ -1,8 +1,9 @@
-using System.Reflection;
 using Api.Endpoints;
+using Api.Endpoints.Xiaomi;
 using Api.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,10 @@ app.MapGet("/ping", () => Results.Ok("pong"));
 
 app.MapUploadEndpoints();
 app.MapBloodPressureEndpoints();
+
+//Xiaomi
+app.MapXiaomiLoginEndpoint();
+app.MapXiaomiWeightsEndpoint();
 
 
 if (!appSettings.General.DisableSwagger)
