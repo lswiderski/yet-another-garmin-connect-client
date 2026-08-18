@@ -1,8 +1,9 @@
-using NLog.Targets;
 using NLog;
+using NLog.Targets;
 using NUnit.Framework;
-using YetAnotherGarminConnectClient.Dto.Garmin.Fit;
 using YetAnotherGarminConnectClient.Dto;
+using YetAnotherGarminConnectClient.Dto.Garmin;
+using YetAnotherGarminConnectClient.Dto.Garmin.Fit;
 
 namespace YetAnotherGarminConnectClient.Tests
 {
@@ -216,6 +217,15 @@ namespace YetAnotherGarminConnectClient.Tests
             }
 
             Assert.IsTrue(isSuccess);
+        }
+
+        [Test]
+        public async Task ShouldSuccessfullGetUserData()
+        {
+           
+            var result = await _client.GetSocialProfile(_credentials);
+
+            Assert.IsTrue(result.IsSuccess);
         }
 
 
